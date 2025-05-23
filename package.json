@@ -1,0 +1,17 @@
+{
+  "name": "puppeteer-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start" : "node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "prettier": "^3.5.3",
+    "puppeteer": "^24.9.0"
+  }
+}
