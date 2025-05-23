@@ -22,5 +22,6 @@ export default class LandingPage {
       this.#PASSWORD_INPUT_SELECTOR,
       password,
     );
+    await this.#elementor.sendKeyEnter();
   }
 }

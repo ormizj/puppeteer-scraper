@@ -16,4 +16,8 @@ export default class Elementor {
     await this.#page.waitForSelector(selector);
     await this.#page.type(selector, text);
   }
+
+  public async sendKeyEnter() {
+    await this.#page.keyboard.press("Enter");
+  }
 }

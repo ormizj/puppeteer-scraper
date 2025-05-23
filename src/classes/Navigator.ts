@@ -9,6 +9,6 @@ export default class Navigator {
   }
 
   async navigateToWebsite() {
-    await this.page.goto(EnvConfig.get("URL"));
+    await this.page.goto(EnvConfig.APP_WEBSITE_URL());
   }
 }

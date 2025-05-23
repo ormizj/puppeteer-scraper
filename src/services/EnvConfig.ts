@@ -1,23 +1,55 @@
 export class EnvConfig {
-  public static get<K extends ConfigKeyNames>(key: K): ConfigKeys[K] {
+  private static getString<K extends ConfigKeyNames>(key: K): ConfigKeys[K] {
     const value = process.env[key];
-
-    // missing definition
     if (value === undefined || value === "") {
       throw new Error(
         `Environment variable '${key}' is not defined or is empty`,
       );
     }
-
-    // number
-    const numValue = Number(value);
-    if (!isNaN(numValue)) return numValue as ConfigKeys[K];
-
-    // boolean
-    if (value === "false") return false as ConfigKeys[K];
-    if (value === "true") return true as ConfigKeys[K];
-
-    // string
     return value as ConfigKeys[K];
+  }
+
+  private static getNumber<K extends ConfigKeyNames>(key: K): ConfigKeys[K] {
+    const value = this.getString(key);
+    const numberValue = Number(value);
+    if (isNaN(numberValue)) {
+      throw new Error(`Environment variable '${key}' must be a valid number`);
+    }
+    return numberValue as ConfigKeys[K];
+  }
+
+  private static getBoolean<K extends ConfigKeyNames>(key: K): ConfigKeys[K] {
+    const value = this.getString(key);
+    if (value === "true") return true as ConfigKeys[K];
+    if (value === "false") return false as ConfigKeys[K];
+    throw new Error(`Environment variable '${key}' must be 'true' or 'false'`);
+  }
+
+  public static APP_WEBSITE_URL(): string {
+    return this.getString("APP_WEBSITE_URL");
+  }
+
+  public static APP_WEBSITE_USERNAME(): string {
+    return this.getString("APP_WEBSITE_USERNAME");
+  }
+
+  public static APP_WEBSITE_PASSWORD(): string {
+    return this.getString("APP_WEBSITE_PASSWORD");
+  }
+
+  public static APP_VIEWPORT_WIDTH(): number {
+    return this.getNumber("APP_VIEWPORT_WIDTH");
+  }
+
+  public static APP_VIEWPORT_HEIGHT(): number {
+    return this.getNumber("APP_VIEWPORT_HEIGHT");
+  }
+
+  public static APP_DEBUG(): boolean {
+    return this.getBoolean("APP_DEBUG");
+  }
+
+  public static APP_DEBUG_SLEEP(): number {
+    return this.getNumber("APP_DEBUG_SLEEP");
   }
 }

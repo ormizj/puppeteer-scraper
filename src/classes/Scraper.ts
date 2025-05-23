@@ -18,8 +18,8 @@ export default class Scraper {
       // login
       const landingPage = new LandingPage(page);
       await landingPage.login(
-        EnvConfig.get("USERNAME"),
-        EnvConfig.get("PASSWORD"),
+        EnvConfig.APP_WEBSITE_USERNAME(),
+        EnvConfig.APP_WEBSITE_PASSWORD(),
       );
     } finally {
       await this.closeBrowser(browser);
@@ -27,12 +27,12 @@ export default class Scraper {
   };
 
   private async initBrowser() {
-    const options = EnvConfig.get("DEBUG")
+    const options = EnvConfig.APP_DEBUG()
       ? // debug options
         {
           headless: false,
           args: [
-            `--window-size=${EnvConfig.get("VIEWPORT_WIDTH")},${EnvConfig.get("VIEWPORT_HEIGHT")}`,
+            `--window-size=${EnvConfig.APP_VIEWPORT_WIDTH()},${EnvConfig.APP_VIEWPORT_HEIGHT()}`,
           ],
         }
       : // normal options
@@ -46,14 +46,14 @@ export default class Scraper {
   private async initPage(browser: Browser) {
     const page = await browser.pages().then((e) => e[0]);
     await page.setViewport({
-      width: EnvConfig.get("VIEWPORT_WIDTH"),
-      height: EnvConfig.get("VIEWPORT_HEIGHT"),
+      width: EnvConfig.APP_VIEWPORT_WIDTH(),
+      height: EnvConfig.APP_VIEWPORT_HEIGHT(),
     });
     return page;
   }
 
   private async closeBrowser(browser: Browser) {
-    if (EnvConfig.get("DEBUG")) await sleep(EnvConfig.get("DEBUG_SLEEP"));
+    if (EnvConfig.APP_DEBUG()) await sleep(EnvConfig.APP_DEBUG_SLEEP());
     await browser.close();
   }
 }
