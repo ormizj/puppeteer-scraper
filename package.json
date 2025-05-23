@@ -5,13 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start" : "node src/index.ts",
+    "start": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "prettier": "^3.5.3",
     "puppeteer": "^24.9.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
   }
 }
