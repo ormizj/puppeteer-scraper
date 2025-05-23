@@ -1,8 +1,9 @@
 import puppeteer from "puppeteer";
 import type { Browser } from "puppeteer";
-import Navigator from "../../elements/Navigator.ts";
-import { EnvConfig } from "../../services/EnvConfig.ts";
-import LandingPage from "../../pages/LandingPage.ts";
+import Navigator from "./Navigator.ts";
+import { EnvConfig } from "../services/EnvConfig.ts";
+import LandingPage from "../pages/LandingPage.ts";
+import { sleep } from "../utils/ScraperUtil.ts";
 
 export default class Scraper {
   public run = async () => {
@@ -21,7 +22,7 @@ export default class Scraper {
         EnvConfig.get("PASSWORD"),
       );
     } finally {
-      await browser.close();
+      await this.closeBrowser(browser);
     }
   };
 
@@ -49,5 +50,10 @@ export default class Scraper {
       height: EnvConfig.get("VIEWPORT_HEIGHT"),
     });
     return page;
+  }
+
+  private async closeBrowser(browser: Browser) {
+    if (EnvConfig.get("DEBUG")) await sleep(EnvConfig.get("DEBUG_SLEEP"));
+    await browser.close();
   }
 }

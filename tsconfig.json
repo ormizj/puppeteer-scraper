@@ -2,6 +2,9 @@
   "compilerOptions": {
     "typeRoots": ["./src/types", "./node_modules/@types"],
     "allowImportingTsExtensions": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "types": []
   },
   "include": [

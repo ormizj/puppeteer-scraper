@@ -1,5 +1,5 @@
 import "dotenv/config";
-import Scraper from "./classes/scraper/Scraper.ts";
+import Scraper from "./classes/Scraper.ts";
 
 const main = async () => {
   try {
