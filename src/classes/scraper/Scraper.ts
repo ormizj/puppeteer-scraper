@@ -1,21 +1,18 @@
 import puppeteer from "puppeteer";
+import type { Browser } from "puppeteer";
 import Navigator from "../../elements/Navigator.ts";
 import { EnvConfig } from "../../services/EnvConfig.ts";
 import LandingPage from "../../pages/LandingPage.ts";
 
 export default class Scraper {
-  public static run = async () => {
-    const browser = await puppeteer.launch({
-      headless: false,
-      args: ["--fast-start", "--disable-extensions", "--no-sandbox"],
-    });
+  public run = async () => {
+    const browser = await this.initBrowser();
     try {
-      // init page
-      const page = await browser.newPage();
-      await page.setViewport({
-        width: EnvConfig.get("VIEWPORT_WIDTH"),
-        height: EnvConfig.get("VIEWPORT_HEIGHT"),
-      });
+      const page = await this.initPage(browser);
+
+      const textSelector = await page.locator(".calculatorTitle").waitHandle();
+
+      return;
 
       // navigate to website
       const navigator = new Navigator(page);
@@ -31,4 +28,27 @@ export default class Scraper {
       await browser.close();
     }
   };
+
+  private async initBrowser() {
+    const options = EnvConfig.get("DEBUG")
+      ? {
+          // debug options
+          headless: false,
+        }
+      : {
+          // normal options
+          headless: true,
+        };
+
+    return await puppeteer.launch(options);
+  }
+
+  private async initPage(browser: Browser) {
+    const page = await browser.pages().then((e) => e[0]);
+    await page.setViewport({
+      width: EnvConfig.get("VIEWPORT_WIDTH"),
+      height: EnvConfig.get("VIEWPORT_HEIGHT"),
+    });
+    return page;
+  }
 }

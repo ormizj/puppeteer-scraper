@@ -7,6 +7,13 @@ export class EnvConfig {
       );
     }
 
+    if (value === "false") {
+      return false as ConfigKeys[K];
+    }
+    if (value === "true") {
+      return true as ConfigKeys[K];
+    }
+
     const numValue = Number(value);
     return (isNaN(numValue) ? value : numValue) as ConfigKeys[K];
   }
