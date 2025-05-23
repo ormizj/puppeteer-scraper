@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "typeRoots": ["./src/types", "./node_modules/@types"],
+    "allowImportingTsExtensions": true,
     "types": []
   },
   "include": [
     "src/**/*"
-  ]
+  ],
 }

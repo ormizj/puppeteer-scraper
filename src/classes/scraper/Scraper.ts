@@ -1,11 +1,14 @@
 import puppeteer from "puppeteer";
-import Navigator from "../../elements/Navigator";
-import { EnvConfig } from "../../services/EnvConfig";
-import LandingPage from "../../pages/LandingPage";
+import Navigator from "../../elements/Navigator.ts";
+import { EnvConfig } from "../../services/EnvConfig.ts";
+import LandingPage from "../../pages/LandingPage.ts";
 
 export default class Scraper {
   public static run = async () => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: false,
+      args: ["--fast-start", "--disable-extensions", "--no-sandbox"],
+    });
     try {
       // init page
       const page = await browser.newPage();

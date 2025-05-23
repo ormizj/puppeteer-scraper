@@ -1,5 +1,5 @@
 import type { Page } from "puppeteer";
-import { EnvConfig } from "../services/EnvConfig";
+import { EnvConfig } from "../services/EnvConfig.ts";
 
 export default class Navigator {
   page: Page;
