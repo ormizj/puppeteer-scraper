@@ -10,10 +10,6 @@ export default class Scraper {
     try {
       const page = await this.initPage(browser);
 
-      const textSelector = await page.locator(".calculatorTitle").waitHandle();
-
-      return;
-
       // navigate to website
       const navigator = new Navigator(page);
       await navigator.navigateToWebsite();
@@ -34,6 +30,9 @@ export default class Scraper {
       ? {
           // debug options
           headless: false,
+          args: [
+            `--window-size=${EnvConfig.get("VIEWPORT_WIDTH")},${EnvConfig.get("VIEWPORT_HEIGHT")}`,
+          ],
         }
       : {
           // normal options
