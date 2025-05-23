@@ -27,15 +27,15 @@ export default class Scraper {
 
   private async initBrowser() {
     const options = EnvConfig.get("DEBUG")
-      ? {
-          // debug options
+      ? // debug options
+        {
           headless: false,
           args: [
             `--window-size=${EnvConfig.get("VIEWPORT_WIDTH")},${EnvConfig.get("VIEWPORT_HEIGHT")}`,
           ],
         }
-      : {
-          // normal options
+      : // normal options
+        {
           headless: true,
         };
 
