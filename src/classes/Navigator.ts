@@ -4,15 +4,15 @@ import { EnvConfig } from "../services/EnvConfig.ts";
 export default class Navigator {
   page: Page;
 
-  public constructor(page: Page) {
+  constructor(page: Page) {
     this.page = page;
   }
 
-  public async navigateToLandingPage() {
+  async navigateToLandingPage() {
     await this.page.goto(EnvConfig.APP_WEBSITE_URL());
   }
 
-  public async navigateToDashboard() {
+  async navigateToDashboard() {
     await this.page.goto(EnvConfig.APP_WEBSITE_DASHBOARD_URL());
   }
 }

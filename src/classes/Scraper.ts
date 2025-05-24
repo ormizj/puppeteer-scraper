@@ -6,7 +6,7 @@ import LandingPage from "../pages/LandingPage.ts";
 import { sleep } from "../utils/ScraperUtil.ts";
 
 export default class Scraper {
-  public run = async () => {
+  run = async () => {
     const browser = await this.initBrowser();
     try {
       const page = await this.initPage(browser);

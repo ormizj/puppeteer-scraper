@@ -25,35 +25,35 @@ export class EnvConfig {
     throw new Error(`Environment variable '${key}' must be 'true' or 'false'`);
   }
 
-  public static APP_WEBSITE_URL(): string {
+  static APP_WEBSITE_URL(): string {
     return this.getString("APP_WEBSITE_URL");
   }
 
-  public static APP_WEBSITE_DASHBOARD_URL(): string {
+  static APP_WEBSITE_DASHBOARD_URL(): string {
     return this.getString("APP_WEBSITE_DASHBOARD_URL");
   }
 
-  public static APP_WEBSITE_USERNAME(): string {
+  static APP_WEBSITE_USERNAME(): string {
     return this.getString("APP_WEBSITE_USERNAME");
   }
 
-  public static APP_WEBSITE_PASSWORD(): string {
+  static APP_WEBSITE_PASSWORD(): string {
     return this.getString("APP_WEBSITE_PASSWORD");
   }
 
-  public static APP_VIEWPORT_WIDTH(): number {
+  static APP_VIEWPORT_WIDTH(): number {
     return this.getNumber("APP_VIEWPORT_WIDTH");
   }
 
-  public static APP_VIEWPORT_HEIGHT(): number {
+  static APP_VIEWPORT_HEIGHT(): number {
     return this.getNumber("APP_VIEWPORT_HEIGHT");
   }
 
-  public static APP_DEBUG(): boolean {
+  static APP_DEBUG(): boolean {
     return this.getBoolean("APP_DEBUG");
   }
 
-  public static APP_DEBUG_SLEEP(): number {
+  static APP_DEBUG_SLEEP(): number {
     return this.getNumber("APP_DEBUG_SLEEP");
   }
 }

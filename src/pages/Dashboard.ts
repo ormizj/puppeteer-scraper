@@ -7,4 +7,6 @@ export default class Dashboard {
   constructor(page: Page) {
     this.#elementor = new Elementor(page);
   }
+
+  downloadAll() {}
 }
