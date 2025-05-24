@@ -48,4 +48,10 @@ export default class Elementor {
     const handle = await element.getProperty(property);
     return `${await handle.jsonValue()}`;
   }
+
+  async scrollIntoView(element: ElementHandle) {
+    await this.#page.evaluate((element) => {
+      element.scrollIntoView();
+    }, element);
+  }
 }
