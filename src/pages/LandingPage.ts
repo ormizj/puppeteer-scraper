@@ -9,11 +9,9 @@ export default class LandingPage {
   readonly #EMAIL_INPUT_SELECTOR = "#email-input";
   readonly #PASSWORD_INPUT_SELECTOR = "#password-input";
 
-  readonly #page: Page;
   readonly #elementor: Elementor;
 
   constructor(page: Page) {
-    this.#page = page;
     this.#elementor = new Elementor(page);
   }
 
