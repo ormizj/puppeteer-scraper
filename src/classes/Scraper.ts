@@ -13,14 +13,17 @@ export default class Scraper {
 
       // navigate to website
       const navigator = new Navigator(page);
-      await navigator.navigateToWebsite();
 
-      // login
+      // landing page
+      await navigator.navigateToLandingPage();
       const landingPage = new LandingPage(page);
       await landingPage.login(
         EnvConfig.APP_WEBSITE_USERNAME(),
         EnvConfig.APP_WEBSITE_PASSWORD(),
       );
+
+      // dashboard
+      await navigator.navigateToDashboard();
     } finally {
       await this.closeBrowser(browser);
     }

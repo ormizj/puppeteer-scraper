@@ -29,6 +29,10 @@ export class EnvConfig {
     return this.getString("APP_WEBSITE_URL");
   }
 
+  public static APP_WEBSITE_DASHBOARD_URL(): string {
+    return this.getString("APP_WEBSITE_DASHBOARD_URL");
+  }
+
   public static APP_WEBSITE_USERNAME(): string {
     return this.getString("APP_WEBSITE_USERNAME");
   }

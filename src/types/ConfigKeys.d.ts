@@ -1,5 +1,6 @@
 type ConfigKeys = {
   APP_WEBSITE_URL: string;
+  APP_WEBSITE_DASHBOARD_URL: string;
   APP_WEBSITE_USERNAME: string;
   APP_WEBSITE_PASSWORD: string;
   APP_VIEWPORT_WIDTH: number;

@@ -20,4 +20,10 @@ export default class Elementor {
   public async sendKeyEnter() {
     await this.#page.keyboard.press("Enter");
   }
+
+  public async waitForElementRemoved(selector: string) {
+    await this.#page.waitForSelector(selector, {
+      hidden: true,
+    });
+  }
 }
