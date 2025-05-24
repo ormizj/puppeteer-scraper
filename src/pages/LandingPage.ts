@@ -1,5 +1,6 @@
 import type { Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
+import { sleep } from "../utils/ScraperUtil.ts";
 
 export default class LandingPage {
   readonly #LOGIN_STEP_1_SELECTOR = "header button";
@@ -23,6 +24,8 @@ export default class LandingPage {
       this.#PASSWORD_INPUT_SELECTOR,
       password,
     );
+    // wait 1 second for the submit to be enabled
+    await sleep(1000);
     await this.#elementor.elementClick(this.#LOGIN_STEP_SUBMIT_SELECTOR);
     await this.#elementor.waitForElementRemoved(
       this.#LOGIN_STEP_SUBMIT_SELECTOR,

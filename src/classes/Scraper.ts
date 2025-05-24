@@ -25,7 +25,7 @@ export default class Scraper {
       // dashboard
       await navigator.navigateToDashboard();
       const dashboard = new Dashboard(page);
-      dashboard.downloadAll();
+      await dashboard.downloadAll();
     } finally {
       await this.closeBrowser(browser);
     }

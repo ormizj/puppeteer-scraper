@@ -1,4 +1,4 @@
-import type { Page } from "puppeteer";
+import { ElementHandle, Page } from "puppeteer";
 
 export default class Elementor {
   readonly #page: Page;
@@ -25,5 +25,22 @@ export default class Elementor {
     await this.#page.waitForSelector(selector, {
       hidden: true,
     });
+  }
+  async getElement(selector: string) {
+    await this.#page.waitForSelector(selector);
+    return await this.#page.$(selector);
+  }
+
+  async getElements(selector: string) {
+    await this.#page.waitForSelector(selector);
+    return await this.#page.$$(selector);
+  }
+
+  async getChildElement(parent: ElementHandle, selector: string) {
+    return await parent.$(selector);
+  }
+
+  async getChildElements(parent: ElementHandle, selector: string) {
+    return await parent.$$(selector);
   }
 }
