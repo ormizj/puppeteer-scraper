@@ -10,9 +10,8 @@ export default class Scraper {
   run = async () => {
     const browser = await this.initBrowser();
     try {
+      // navigator
       const page = await this.initPage(browser);
-
-      // navigate to website
       const navigator = new Navigator(page);
 
       // landing page
