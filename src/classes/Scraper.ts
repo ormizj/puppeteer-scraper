@@ -4,6 +4,7 @@ import Navigator from "./Navigator.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
 import LandingPage from "../pages/LandingPage.ts";
 import { sleep } from "../utils/ScraperUtil.ts";
+import Dashboard from "../pages/Dashboard.ts";
 
 export default class Scraper {
   run = async () => {
@@ -24,6 +25,8 @@ export default class Scraper {
 
       // dashboard
       await navigator.navigateToDashboard();
+      const dashboard = new Dashboard(page);
+      dashboard.downloadAll();
     } finally {
       await this.closeBrowser(browser);
     }
