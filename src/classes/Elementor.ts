@@ -43,4 +43,9 @@ export default class Elementor {
   async getChildElements(parent: ElementHandle, selector: string) {
     return await parent.$$(selector);
   }
+
+  async getProperty(element: ElementHandle, property: string): Promise<string> {
+    const handle = await element.getProperty(property);
+    return `${await handle.jsonValue()}`;
+  }
 }
