@@ -25,6 +25,14 @@ export class EnvConfig {
     throw new Error(`Environment variable '${key}' must be 'true' or 'false'`);
   }
 
+  static APP_DATABASE_NAME(): string {
+    return this.getString("APP_DATABASE_NAME");
+  }
+
+  static APP_DOWNLOAD_PATH(): string {
+    return this.getString("APP_DOWNLOAD_PATH");
+  }
+
   static APP_WEBSITE_URL(): string {
     return this.getString("APP_WEBSITE_URL");
   }
