@@ -9,6 +9,8 @@ const main = async () => {
   let pluginsCleanupFn: () => void;
   try {
     pluginsCleanupFn = initializePlugins();
+
+    // run script
     const prompter = new Prompter();
     switch (await prompter.promptMainMenu()) {
       case "scrape":
@@ -21,6 +23,7 @@ const main = async () => {
       default:
         break;
     }
+
     process.exit(0);
   } catch (e) {
     console.error(e);
