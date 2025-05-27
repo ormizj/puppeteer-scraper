@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { initializePlugins } from "./plugins/Plugins.ts";
-import Scraper from "./classes/Scraper.ts";
 import Prompter from "./classes/Prompter.ts";
 import scrape from "./commands/scrape.ts";
 import showDuplicates from "./commands/showDuplicates.ts";
