@@ -1,7 +1,7 @@
 import * as readline from "readline";
 
 export default class Prompter {
-  private readonly menuOptions: MenuOption[] = [
+  private readonly menuOptions: PromptOption[] = [
     { key: "scrape", description: "Start web scraping process" },
     {
       key: "show-duplicates",
@@ -10,34 +10,62 @@ export default class Prompter {
     { key: "exit", description: "Exit the application" },
   ];
 
-  async promptMainMenu(): Promise<PromptOption> {
-    // initialize readline
-    const rl = readline.createInterface({
+  async promptMainMenu(): Promise<PromptKey> {
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        this.printMenu();
+        const rl = this.initializeReadline();
+        const answer = await this.getAnswer(rl);
+        rl.close();
+
+        // check if answer valid
+        try {
+          this.validateAnswer(answer);
+          resolve(this.menuOptions[answer].key);
+        } catch (error) {
+          const e = error as Error;
+          console.log(e.message);
+          return await this.promptMainMenu();
+        }
+      });
+    });
+  }
+
+  private validateAnswer(selectedIndex: number) {
+    if (selectedIndex < 1 || selectedIndex > this.menuOptions.length - 1) {
+      throw new Error("Invalid selection. Please try again");
+    }
+  }
+
+  /**
+   * @param rl
+   * @private
+   * @return {Promise} containing the index of the selected option
+   */
+  private async getAnswer(rl: readline.Interface): Promise<number> {
+    let initialAnswer = await this.getUserInput(
+      rl,
+      `Please select an option (1-${this.menuOptions.length}): `,
+    );
+    return parseInt(initialAnswer.trim()) - 1;
+  }
+
+  private initializeReadline() {
+    return readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
+  }
 
-    // print menu
-    console.log("\n=== Main Menu ===");
+  private printMenu() {
+    console.log("");
+    console.log("");
+    console.log("=== Main Menu ===");
+    console.log("");
     this.menuOptions.forEach((option, index) => {
       console.log(`${index + 1}. ${option.description}`);
     });
-
-    // get answer
-    const answer = await this.getUserInput(
-      rl,
-      "Please select an option (1-3): ",
-    );
-    rl.close();
-
-    // check if answer valid
-    const selectedIndex = parseInt(answer.trim()) - 1;
-    if (selectedIndex >= 0 && selectedIndex < this.menuOptions.length) {
-      return this.menuOptions[selectedIndex].key;
-    } else {
-      console.log("Invalid selection. Please try again");
-      return await this.promptMainMenu();
-    }
+    console.log();
   }
 
   private getUserInput(
