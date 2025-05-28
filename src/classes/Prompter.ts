@@ -20,7 +20,7 @@ export default class Prompter {
         const rl = this.initializeReadline();
 
         console.log(`\nAre you sure you want to preform this action?`);
-        const answer = await this.getUserInput(rl, "Type 'yes' to confirm:\n");
+        const answer = await this.getUserInput(rl, 'Type "yes" to confirm:\n');
         rl.close();
 
         const isConfirmed = answer.trim().toLowerCase() === "yes";
