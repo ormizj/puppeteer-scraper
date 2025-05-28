@@ -1,1 +1,1 @@
-type PromptKey = "scrape" | "show-duplicates" | "exit";
+type PromptKey = "scrape" | "show-duplicates" | "reset-database" | "exit";

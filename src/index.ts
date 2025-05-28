@@ -3,6 +3,7 @@ import { initializePlugins } from "./plugins/Plugins.ts";
 import Prompter from "./classes/Prompter.ts";
 import scrape from "./commands/scrape.ts";
 import showDuplicates from "./commands/showDuplicates.ts";
+import resetDatabase from "./commands/resetDatabase.ts";
 
 const main = async () => {
   let pluginsCleanupFn: () => void;
@@ -17,6 +18,9 @@ const main = async () => {
         break;
       case "show-duplicates":
         await showDuplicates();
+        break;
+      case "reset-database":
+        await resetDatabase();
         break;
       case "exit":
       default:

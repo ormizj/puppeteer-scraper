@@ -7,8 +7,27 @@ export default class Prompter {
       key: "show-duplicates",
       description: "Display duplicate scraped data entries",
     },
+    {
+      key: "reset-database",
+      description: "Reset all scrapped data entries from the Database",
+    },
     { key: "exit", description: "Exit the application" },
   ];
+
+  async promptConfirmation(): Promise<boolean> {
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        const rl = this.initializeReadline();
+
+        console.log(`\nAre you sure you want to preform this action?`);
+        const answer = await this.getUserInput(rl, "Type 'yes' to confirm:\n");
+        rl.close();
+
+        const isConfirmed = answer.trim().toLowerCase() === "yes";
+        resolve(isConfirmed);
+      });
+    });
+  }
 
   async promptMainMenu(): Promise<PromptKey> {
     return new Promise((resolve) => {
