@@ -12,7 +12,8 @@ const main = async () => {
 
     // run script
     const prompter = new Prompter();
-    switch (await prompter.promptMainMenu()) {
+    const answer = await prompter.promptMainMenu();
+    switch (answer) {
       case "scrape":
         await scrape();
         break;

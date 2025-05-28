@@ -1,4 +1,3 @@
-import Scraper from "../classes/Scraper.ts";
 import Database from "../classes/Database.ts";
 
 export default async () => {
