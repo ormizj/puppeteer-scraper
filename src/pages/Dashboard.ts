@@ -1,6 +1,8 @@
 import type { Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
 import { sleep } from "../utils/ScraperUtil.ts";
+import Database from "../classes/Database.ts";
+import DashboardElement from "./DashboardElement.ts";
 
 export default class Dashboard {
   readonly #CONTENT_CONTAINER_SELECTOR = "[data-test-id=virtuoso-scroller]";
@@ -33,6 +35,7 @@ export default class Dashboard {
   }
 
   async downloadAll() {
+    const db = new Database();
     const contentContainer = await this.#elementor.getElement(
       this.#CONTENT_CONTAINER_SELECTOR,
     );
@@ -59,27 +62,25 @@ export default class Dashboard {
         );
         const id = await this.#elementor.getProperty(idElement, "src");
 
-        // if failed validation
-        if (false) continue;
+        // scroll and validate
+        await this.#elementor.scrollIntoView(activator);
+        if (db.getRecordByUid(id)) continue;
+        db.insertRecord(id);
 
         // do action
-        await this.#elementor.scrollIntoView(activator);
+        await activator.click();
+
+        // download element
+        const dashboardElement = new DashboardElement(this.#page);
+        await dashboardElement.download(id);
+
+        // add to count
         processed++;
         await sleep(1000);
-        await activator.click();
       }
 
       // if any new elements where processed, check for new elements
     } while (processed);
-  }
-
-  private download() {
-    // 0.0. store in a file the list of ids
-    // 0.1. check if id exists before continuing to download
-    // 0. use download env (this function should be in a util class, not here)
-    // 1. search for a folder %like% for category name
-    // 2. hash the data (maybe readable) to create a subfolder
-    // 3. place all the content with the same hash with the same folder
-    // 4. if folder is new, create a text containing the hash values (before hashing)
+    db.close();
   }
 }

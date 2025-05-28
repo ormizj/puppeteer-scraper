@@ -54,4 +54,12 @@ export default class Elementor {
       element.scrollIntoView();
     }, element);
   }
+
+  async getText(selector: string): Promise<string> {
+    await this.#page.waitForSelector(selector);
+    return await this.#page.$eval(
+      selector,
+      (element) => element.textContent || "",
+    );
+  }
 }

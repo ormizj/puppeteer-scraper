@@ -24,7 +24,7 @@ export default class LandingPage {
       this.#PASSWORD_INPUT_SELECTOR,
       password,
     );
-    // wait 1 second for the submit to be enabled
+    // wait 1 second for submit to be enabled
     await sleep(1000);
     await this.#elementor.elementClick(this.#LOGIN_STEP_SUBMIT_SELECTOR);
     await this.#elementor.waitForElementRemoved(

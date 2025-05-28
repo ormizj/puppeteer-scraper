@@ -32,7 +32,7 @@ export default class Prompter {
   }
 
   private validateAnswer(selectedIndex: number) {
-    if (selectedIndex < 1 || selectedIndex > this.menuOptions.length - 1) {
+    if (selectedIndex < 0 || selectedIndex > this.menuOptions.length - 1) {
       throw new Error("Invalid selection. Please try again");
     }
   }
