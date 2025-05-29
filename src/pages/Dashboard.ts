@@ -25,6 +25,7 @@ export default class Dashboard {
    * @see CONTENT_CONTAINER_DATA_SELECTOR
    */
   readonly #CONTENT_CONTAINER_DATA_ID_SELECTOR = "img";
+  readonly #INFORMATION_EXPAND_BUTTON = "header>button.absolute";
 
   readonly #page: Page;
   readonly #elementor: Elementor;
@@ -36,10 +37,11 @@ export default class Dashboard {
 
   async downloadAll() {
     const db = new Database();
+    await sleep(1000);
     const contentContainer = await this.#elementor.getElement(
       this.#CONTENT_CONTAINER_SELECTOR,
     );
-    await sleep(1000);
+    await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
 
     let processed: number;
     do {
