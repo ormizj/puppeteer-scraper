@@ -44,22 +44,48 @@ export default class Elementor {
     return await parent.$$(selector);
   }
 
-  async getProperty(element: ElementHandle, property: string): Promise<string> {
-    const handle = await element.getProperty(property);
-    return `${await handle.jsonValue()}`;
-  }
-
   async scrollIntoView(element: ElementHandle) {
     await this.#page.evaluate((element) => {
       element.scrollIntoView();
     }, element);
   }
 
-  async getText(selector: string): Promise<string> {
-    await this.#page.waitForSelector(selector);
-    return await this.#page.$eval(
-      selector,
-      (element) => element.textContent || "",
-    );
+  async getText(selector: string): Promise<string>;
+  async getText(element: ElementHandle, selector: string): Promise<string>;
+  async getText(
+    selectorOrElement: string | ElementHandle,
+    selector?: string,
+  ): Promise<string> {
+    // element and selector passed
+    if (typeof selectorOrElement !== "string") {
+      const childElement = await this.getChildElement(
+        selectorOrElement,
+        selector,
+      );
+      return await childElement.evaluate(
+        (element) => element.textContent || "",
+      );
+
+      // selector passed
+    } else {
+      await this.#page.waitForSelector(selectorOrElement);
+      return await this.#page.$eval(
+        selectorOrElement,
+        (element) => element.textContent || "",
+      );
+    }
+  }
+
+  async getProperty(selector: string, property: string): Promise<string>;
+  async getProperty(element: ElementHandle, property: string): Promise<string>;
+  async getProperty(
+    elementOrSelector: ElementHandle | string,
+    property: string,
+  ): Promise<string> {
+    if (typeof elementOrSelector === "string") {
+      elementOrSelector = await this.getElement(elementOrSelector);
+    }
+    const handle = await elementOrSelector.getProperty(property);
+    return `${await handle.jsonValue()}`;
   }
 }
