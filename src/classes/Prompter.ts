@@ -1,4 +1,5 @@
-import * as readline from "readline";
+import readline from "readline/promises";
+import { stdin as input, stdout as output } from "process";
 
 export default class Prompter {
   private readonly menuOptions: PromptOption[] = [
@@ -69,13 +70,6 @@ export default class Prompter {
     return parseInt(initialAnswer.trim()) - 1;
   }
 
-  private initializeReadline() {
-    return readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-  }
-
   private printMenu() {
     console.log("");
     console.log("");
@@ -87,14 +81,20 @@ export default class Prompter {
     console.log();
   }
 
-  private getUserInput(
+  private initializeReadline() {
+    return readline.createInterface({
+      terminal: false,
+      input,
+      output,
+    });
+  }
+
+  private async getUserInput(
     rl: readline.Interface,
     question: string,
   ): Promise<string> {
-    return new Promise((resolve) => {
-      rl.question(question, (answer) => {
-        resolve(answer);
-      });
-    });
+    const answer = await rl.question(`${question}\n`);
+    console.log("");
+    return answer;
   }
 }
