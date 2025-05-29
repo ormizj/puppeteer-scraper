@@ -39,6 +39,7 @@ export default class Dashboard {
     const contentContainer = await this.#elementor.getElement(
       this.#CONTENT_CONTAINER_SELECTOR,
     );
+    await sleep(1000);
 
     let processed: number;
     do {

@@ -62,9 +62,11 @@ export default class Elementor {
         selectorOrElement,
         selector,
       );
-      return await childElement.evaluate(
-        (element) => element.textContent || "",
-      );
+      return await childElement.evaluate((element) => {
+        console.log(element);
+        console.log(element.textContent);
+        return element.textContent || "";
+      });
 
       // selector passed
     } else {
@@ -76,16 +78,35 @@ export default class Elementor {
     }
   }
 
+  async getProperty(
+    element: ElementHandle,
+    selector: string,
+    property: string,
+  ): Promise<string>;
   async getProperty(selector: string, property: string): Promise<string>;
   async getProperty(element: ElementHandle, property: string): Promise<string>;
   async getProperty(
     elementOrSelector: ElementHandle | string,
-    property: string,
+    selectorOrProperty: string,
+    property?: string,
   ): Promise<string> {
+    let targetElement: ElementHandle;
     if (typeof elementOrSelector === "string") {
-      elementOrSelector = await this.getElement(elementOrSelector);
+      targetElement = await this.getElement(elementOrSelector);
+      property = selectorOrProperty;
+    } else {
+      if (property) {
+        targetElement = await this.getChildElement(
+          elementOrSelector,
+          selectorOrProperty,
+        );
+      } else {
+        targetElement = elementOrSelector;
+        property = selectorOrProperty;
+      }
     }
-    const handle = await elementOrSelector.getProperty(property);
+
+    const handle = await targetElement.getProperty(property);
     return `${await handle.jsonValue()}`;
   }
 }

@@ -8,7 +8,7 @@ export default class DashboardElement {
     "section:has(.MuiButtonBase-root > svg)";
   readonly #SECONDARY_ATTRIBUTE_CONTENT_SELECTOR = "div.rounded-xl:has(a)";
   readonly #SECONDARY_ATTRIBUTE_CONTENT_TITLE_SELECTOR = "a";
-  readonly #SECONDARY_ATTRIBUTE_CONTENT_VALUE_SELECTOR = "span+div";
+  readonly #SECONDARY_ATTRIBUTE_CONTENT_VALUE_SELECTOR = "span+div>input";
 
   readonly #elementor: Elementor;
 
@@ -46,9 +46,10 @@ export default class DashboardElement {
         element,
         this.#SECONDARY_ATTRIBUTE_CONTENT_TITLE_SELECTOR,
       );
-      const value = await this.#elementor.getText(
+      const value = await this.#elementor.getProperty(
         element,
         this.#SECONDARY_ATTRIBUTE_CONTENT_VALUE_SELECTOR,
+        "value",
       );
       console.log("element", title, value);
     }
