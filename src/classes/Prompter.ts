@@ -45,7 +45,7 @@ export default class Prompter {
         } catch (error) {
           const e = error as Error;
           console.log(e.message);
-          return await this.promptMainMenu();
+          resolve(await this.promptMainMenu());
         }
       });
     });
@@ -78,7 +78,7 @@ export default class Prompter {
     this.menuOptions.forEach((option, index) => {
       console.log(`${index + 1}. ${option.description}`);
     });
-    console.log();
+    console.log("");
   }
 
   private initializeReadline() {
