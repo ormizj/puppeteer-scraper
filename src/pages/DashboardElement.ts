@@ -2,13 +2,17 @@ import type { Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
 
 export default class DashboardElement {
-  readonly #MAIN_CONTENT_SELECTOR = "main textarea";
-  readonly #PRIMARY_ATTRIBUTE_SELECTOR = "p a";
-  readonly #SECONDARY_ATTRIBUTE_SELECTOR =
-    "section:has(.MuiButtonBase-root > svg)";
-  readonly #SECONDARY_ATTRIBUTE_CONTENT_SELECTOR = "div.rounded-xl:has(a)";
-  readonly #SECONDARY_ATTRIBUTE_CONTENT_TITLE_SELECTOR = "a";
-  readonly #SECONDARY_ATTRIBUTE_CONTENT_VALUE_SELECTOR = "span+div>input";
+  // PROMPT
+  readonly #PROMPT_SELECTOR = "main textarea";
+  // MODEL
+  readonly #MODEL_SELECTOR = "p a";
+  // LORA
+  readonly #LORA_CONTAINER_SELECTOR = "section:has(.MuiButtonBase-root > svg)";
+  readonly #LORA_SELECTOR = "div.rounded-xl:has(a)";
+  readonly #LORA_NAME_SELECTOR = "a";
+  readonly #LORA_WEIGHT_SELECTOR = "span+div>input";
+  // METADATA
+  readonly #ATTRIBUTES_CONTAINER_SELECTOR = "section:has(section)";
 
   readonly #elementor: Elementor;
 
@@ -17,42 +21,77 @@ export default class DashboardElement {
   }
 
   async download(id: string) {
-    // main content
-    const mainContent = await this.#elementor.getText(
-      this.#MAIN_CONTENT_SELECTOR,
+    const data = await this.getAllData();
+    console.log(
+      "====================================================================================================",
     );
-    console.log("mainContent", mainContent);
+    console.log(id);
+    console.log(data);
+    console.log(
+      "====================================================================================================",
+    );
+  }
 
-    // primary attribute
-    const primaryAttributeText = await this.#elementor.getText(
-      this.#PRIMARY_ATTRIBUTE_SELECTOR,
-    );
-    const primaryAttributeHref = await this.#elementor.getProperty(
-      this.#PRIMARY_ATTRIBUTE_SELECTOR,
+  private async getAllData() {
+    return {
+      ...(await this.getPrompt()),
+      ...(await this.getModel()),
+      ...(await this.getLora()),
+    };
+  }
+
+  private async getPrompt() {
+    const mainContent = await this.#elementor.getText(this.#PROMPT_SELECTOR);
+    return {
+      prompt: mainContent,
+    };
+  }
+
+  private async getModel() {
+    const modelName = await this.#elementor.getText(this.#MODEL_SELECTOR);
+    const modelLink = await this.#elementor.getProperty(
+      this.#MODEL_SELECTOR,
       "href",
     );
-    console.log("primaryAttribute", primaryAttributeText, primaryAttributeHref);
+    return {
+      model: {
+        name: modelName,
+        link: modelLink,
+      },
+    };
+  }
 
-    // secondary attribute
+  private async getLora() {
     const secondaryAttribute = await this.#elementor.getElement(
-      this.#SECONDARY_ATTRIBUTE_SELECTOR,
+      this.#LORA_CONTAINER_SELECTOR,
     );
     const secondaryAttributeContent = await this.#elementor.getChildElements(
       secondaryAttribute,
-      this.#SECONDARY_ATTRIBUTE_CONTENT_SELECTOR,
+      this.#LORA_SELECTOR,
     );
+    const lora = [];
     for (const element of secondaryAttributeContent) {
-      const title = await this.#elementor.getText(
+      const name = await this.#elementor.getText(
         element,
-        this.#SECONDARY_ATTRIBUTE_CONTENT_TITLE_SELECTOR,
+        this.#LORA_NAME_SELECTOR,
       );
-      const value = await this.#elementor.getProperty(
+      const link = await this.#elementor.getProperty(
         element,
-        this.#SECONDARY_ATTRIBUTE_CONTENT_VALUE_SELECTOR,
+        this.#LORA_NAME_SELECTOR,
+        "href",
+      );
+      const weight = await this.#elementor.getProperty(
+        element,
+        this.#LORA_WEIGHT_SELECTOR,
         "value",
       );
-      console.log("element", title, value);
+      lora.push({
+        name,
+        link,
+        weight,
+      });
     }
+    return { lora };
   }
 
   // private download() {
