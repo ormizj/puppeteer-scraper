@@ -1,5 +1,7 @@
 import type { ElementHandle, Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
+import { retryHandler } from "../utils/RetryUtil.ts";
+import { sleep } from "../utils/ScraperUtil.ts";
 
 export default class DashboardElement {
   // PROMPT
@@ -38,18 +40,20 @@ export default class DashboardElement {
   /* METADATA */
 
   readonly #elementor: Elementor;
+  readonly #id: string;
   #metaDataContainer: ElementHandle[];
 
-  constructor(page: Page) {
+  constructor(page: Page, id: string) {
     this.#elementor = new Elementor(page);
+    this.#id = id;
   }
 
-  async download(id: string) {
+  async download() {
     const data = await this.getAllData();
     console.log(
       "====================================================================================================",
     );
-    console.log(id);
+    console.log(this.#id);
     console.log(data);
     console.log(
       "====================================================================================================",
@@ -91,6 +95,25 @@ export default class DashboardElement {
   }
 
   private async getLora() {
+    try {
+      return await retryHandler(
+        () => this.getLoraHelper(),
+        100,
+        async () => {
+          await sleep(100);
+          return true;
+        },
+      );
+    } catch (e) {
+      const error = e as Error;
+      console.warn(error.message);
+      return {
+        lora: [],
+      };
+    }
+  }
+
+  private async getLoraHelper() {
     const loraElementsContainer = await this.#elementor.getElement(
       this.#LORA_CONTAINER_SELECTOR,
     );
@@ -99,7 +122,15 @@ export default class DashboardElement {
       this.#LORA_ELEMENT_SELECTOR,
     );
 
-    const lora = [];
+    if (loraElements.length === 0) {
+      throw new Error(`Failed to find LoRA for ID: ${this.#id}`);
+    }
+
+    const lora = [] as {
+      name: string;
+      link: string;
+      weight: string;
+    }[];
     for (const element of loraElements) {
       const name = await this.#elementor.getText(element, this.#LORA_SELECTOR);
       const link = await this.#elementor.getProperty(

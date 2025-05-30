@@ -42,9 +42,9 @@ export default class Prompter {
         try {
           this.validateAnswer(answer);
           resolve(this.menuOptions[answer].key);
-        } catch (error) {
-          const e = error as Error;
-          console.log(e.message);
+        } catch (e) {
+          const error = e as Error;
+          console.log(error.message);
           resolve(await this.promptMainMenu());
         }
       });

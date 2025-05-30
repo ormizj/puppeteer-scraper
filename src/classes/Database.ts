@@ -37,9 +37,9 @@ export default class Database {
       `);
 
       return insertQuery.run(uid);
-    } catch (error) {
-      console.error(error);
-      throw error;
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   }
 
@@ -51,9 +51,9 @@ export default class Database {
 
       const record = selectQuery.get(uid);
       return record ? record : null;
-    } catch (error) {
-      console.error(error);
-      throw error;
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   }
 
@@ -89,9 +89,9 @@ export default class Database {
           created_at: timestamps,
         };
       });
-    } catch (error) {
-      console.error(error);
-      throw error;
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   }
 
@@ -102,9 +102,9 @@ export default class Database {
       `);
 
       return selectAllQuery.all();
-    } catch (error) {
-      console.error(error);
-      throw error;
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   }
 
@@ -119,9 +119,9 @@ export default class Database {
       DELETE FROM sqlite_sequence WHERE name = 'downloaded_data'
     `);
       resetAutoIncrementQuery.run();
-    } catch (error) {
-      console.error(error);
-      throw error;
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   }
 
