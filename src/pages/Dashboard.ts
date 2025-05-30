@@ -26,6 +26,7 @@ export default class Dashboard {
    */
   readonly #CONTENT_CONTAINER_DATA_ID_SELECTOR = "img";
   readonly #INFORMATION_EXPAND_BUTTON = "header>button.absolute";
+  readonly #MAIN_LOADER_SELECTOR = '[class*="_preloader"]';
   readonly #LOADER_SELECTOR =
     ".w-5.h-5.absolute.inset-0.m-auto,.MuiCircularProgress-root";
 
@@ -44,6 +45,7 @@ export default class Dashboard {
       this.#CONTENT_CONTAINER_SELECTOR,
     );
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
+    // await this.#elementor.enableSlowNetwork();
 
     let processed: number;
     do {
@@ -74,6 +76,9 @@ export default class Dashboard {
 
         // do action
         await activator.click();
+        await this.#elementor.waitForElementRemovedIfExists(
+          this.#MAIN_LOADER_SELECTOR,
+        );
         await this.#elementor.waitForElementRemovedIfExists(
           this.#LOADER_SELECTOR,
         );
