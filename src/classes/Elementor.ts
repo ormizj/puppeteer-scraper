@@ -7,6 +7,27 @@ export default class Elementor {
     this.#page = page;
   }
 
+  async enableSlowNetwork() {
+    const client = await this.#page.createCDPSession();
+    await client.send("Network.enable");
+    await client.send("Network.emulateNetworkConditions", {
+      offline: false,
+      downloadThroughput: (50 * 1024) / 8, // 50 KB/s
+      uploadThroughput: (25 * 1024) / 8, // 25 KB/s
+      latency: 500, // 500ms latency
+    });
+  }
+
+  async disableSlowNetwork() {
+    const client = await this.#page.createCDPSession();
+    await client.send("Network.emulateNetworkConditions", {
+      offline: false,
+      downloadThroughput: -1,
+      uploadThroughput: -1,
+      latency: 0,
+    });
+  }
+
   async elementClick(selector: string) {
     await this.#page.waitForSelector(selector);
     await this.#page.click(selector);
