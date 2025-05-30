@@ -8,8 +8,8 @@ export default class DashboardElement {
   readonly #MODEL_SELECTOR = "p a";
   // LORA
   readonly #LORA_CONTAINER_SELECTOR = "section:has(.MuiButtonBase-root > svg)";
-  readonly #LORA_SELECTOR = "div.rounded-xl:has(a)";
-  readonly #LORA_NAME_SELECTOR = "a";
+  readonly #LORA_ELEMENT_SELECTOR = "div.rounded-xl:has(a)";
+  readonly #LORA_SELECTOR = "a";
   readonly #LORA_WEIGHT_SELECTOR = "span+div>input";
   // METADATA
   readonly #ATTRIBUTES_CONTAINER_SELECTOR = "section:has(section)";
@@ -47,9 +47,8 @@ export default class DashboardElement {
   }
 
   private async getPrompt() {
-    const mainContent = await this.#elementor.getText(this.#PROMPT_SELECTOR);
     return {
-      prompt: mainContent,
+      prompt: await this.#elementor.getText(this.#PROMPT_SELECTOR),
     };
   }
 
@@ -68,22 +67,20 @@ export default class DashboardElement {
   }
 
   private async getLora() {
-    const secondaryAttribute = await this.#elementor.getElement(
+    const loraElementsContainer = await this.#elementor.getElement(
       this.#LORA_CONTAINER_SELECTOR,
     );
-    const secondaryAttributeContent = await this.#elementor.getChildElements(
-      secondaryAttribute,
-      this.#LORA_SELECTOR,
+    const loraElements = await this.#elementor.getChildElements(
+      loraElementsContainer,
+      this.#LORA_ELEMENT_SELECTOR,
     );
+
     const lora = [];
-    for (const element of secondaryAttributeContent) {
-      const name = await this.#elementor.getText(
-        element,
-        this.#LORA_NAME_SELECTOR,
-      );
+    for (const element of loraElements) {
+      const name = await this.#elementor.getText(element, this.#LORA_SELECTOR);
       const link = await this.#elementor.getProperty(
         element,
-        this.#LORA_NAME_SELECTOR,
+        this.#LORA_SELECTOR,
         "href",
       );
       const weight = await this.#elementor.getProperty(
@@ -97,6 +94,7 @@ export default class DashboardElement {
         weight,
       });
     }
+
     return { lora };
   }
 
