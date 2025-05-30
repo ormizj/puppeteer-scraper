@@ -75,7 +75,7 @@ export default class DashboardElement {
     const loraElementsContainer = await this.#elementor.getElement(
       this.#LORA_CONTAINER_SELECTOR,
     );
-    const loraElements = await this.#elementor.getChildElements(
+    const loraElements = await this.#elementor.getElements(
       loraElementsContainer,
       this.#LORA_ELEMENT_SELECTOR,
     );

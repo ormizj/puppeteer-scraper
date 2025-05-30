@@ -48,18 +48,18 @@ export default class Dashboard {
       processed = 0;
 
       // re-select data elements
-      let dataElements = await this.#elementor.getChildElements(
+      let dataElements = await this.#elementor.getElements(
         contentContainer,
         this.#CONTENT_CONTAINER_DATA_SELECTOR,
       );
       // go over elements
       for (const element of dataElements) {
         // init
-        const activator = await this.#elementor.getChildElement(
+        const activator = await this.#elementor.getElement(
           element,
           this.#CONTENT_CONTAINER_DATA_ACTIVATOR_SELECTOR,
         );
-        const idElement = await this.#elementor.getChildElement(
+        const idElement = await this.#elementor.getElement(
           element,
           this.#CONTENT_CONTAINER_DATA_ID_SELECTOR,
         );
@@ -79,7 +79,6 @@ export default class Dashboard {
 
         // add to count
         processed++;
-        await sleep(1000);
       }
 
       // if any new elements where processed, check for new elements

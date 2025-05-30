@@ -26,23 +26,6 @@ export default class Elementor {
       hidden: true,
     });
   }
-  async getElement(selector: string) {
-    await this.#page.waitForSelector(selector);
-    return await this.#page.$(selector);
-  }
-
-  async getElements(selector: string) {
-    await this.#page.waitForSelector(selector);
-    return await this.#page.$$(selector);
-  }
-
-  async getChildElement(parent: ElementHandle, selector: string) {
-    return await parent.$(selector);
-  }
-
-  async getChildElements(parent: ElementHandle, selector: string) {
-    return await parent.$$(selector);
-  }
 
   async scrollIntoView(element: ElementHandle) {
     await this.#page.evaluate((element) => {
@@ -50,36 +33,63 @@ export default class Elementor {
     }, element);
   }
 
+  async getElement(
+    parent: ElementHandle,
+    selector: string,
+  ): Promise<ElementHandle>;
+  async getElement(selector: string): Promise<ElementHandle>;
+  async getElement(
+    elementOrSelector: ElementHandle | string,
+    selector?: string,
+  ): Promise<ElementHandle> {
+    if (typeof elementOrSelector !== "string") {
+      return await elementOrSelector.$(selector);
+    }
+    await this.#page.waitForSelector(elementOrSelector);
+    return await this.#page.$(elementOrSelector);
+  }
+
+  async getElements(
+    parent: ElementHandle,
+    selector: string,
+  ): Promise<ElementHandle[]>;
+  async getElements(selector: string): Promise<ElementHandle[]>;
+  async getElements(
+    elementOrSelector: ElementHandle | string,
+    selector?: string,
+  ): Promise<ElementHandle[]> {
+    if (typeof elementOrSelector !== "string") {
+      return await elementOrSelector.$$(selector);
+    }
+    await this.#page.waitForSelector(elementOrSelector);
+    return await this.#page.$$(elementOrSelector);
+  }
+
   async getText(selector: string): Promise<string>;
-  async getText(element: ElementHandle, selector: string): Promise<string>;
+  async getText(parent: ElementHandle, selector: string): Promise<string>;
   async getText(
-    selectorOrElement: string | ElementHandle,
+    elementOrSelector: string | ElementHandle,
     selector?: string,
   ): Promise<string> {
     // element and selector passed
-    if (typeof selectorOrElement !== "string") {
-      const childElement = await this.getChildElement(
-        selectorOrElement,
-        selector,
-      );
+    if (typeof elementOrSelector !== "string") {
+      const childElement = await this.getElement(elementOrSelector, selector);
       return await childElement.evaluate((element) => {
-        console.log(element);
-        console.log(element.textContent);
         return element.textContent || "";
       });
 
       // selector passed
     } else {
-      await this.#page.waitForSelector(selectorOrElement);
+      await this.#page.waitForSelector(elementOrSelector);
       return await this.#page.$eval(
-        selectorOrElement,
+        elementOrSelector,
         (element) => element.textContent || "",
       );
     }
   }
 
   async getProperty(
-    element: ElementHandle,
+    parent: ElementHandle,
     selector: string,
     property: string,
   ): Promise<string>;
@@ -96,7 +106,7 @@ export default class Elementor {
       property = selectorOrProperty;
     } else {
       if (property) {
-        targetElement = await this.getChildElement(
+        targetElement = await this.getElement(
           elementOrSelector,
           selectorOrProperty,
         );
