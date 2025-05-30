@@ -37,6 +37,12 @@ export default class DashboardElement {
       ...(await this.getPrompt()),
       ...(await this.getModel()),
       ...(await this.getLora()),
+      ...(await this.getSize()),
+      ...(await this.getNegative()),
+      ...(await this.getSampling()),
+      ...(await this.getCfg()),
+      ...(await this.getSeed()),
+      ...(await this.getVaeModel()),
     };
   }
 
@@ -92,6 +98,30 @@ export default class DashboardElement {
       });
     }
     return { lora };
+  }
+
+  private async getSize() {
+    return {};
+  }
+
+  private async getNegative() {
+    return {};
+  }
+
+  private async getSampling() {
+    return {};
+  }
+
+  private async getCfg() {
+    return {};
+  }
+
+  private async getSeed() {
+    return {};
+  }
+
+  private async getVaeModel() {
+    return {};
   }
 
   // private download() {
