@@ -26,6 +26,7 @@ export default class Dashboard {
    */
   readonly #CONTENT_CONTAINER_DATA_ID_SELECTOR = "img";
   readonly #INFORMATION_EXPAND_BUTTON = "header>button.absolute";
+  readonly #LOADER_SELECTOR = ".absolute.inset-0";
 
   readonly #page: Page;
   readonly #elementor: Elementor;
@@ -72,6 +73,9 @@ export default class Dashboard {
 
         // do action
         await activator.click();
+        await this.#elementor.waitForElementRemovedIfExists(
+          this.#LOADER_SELECTOR,
+        );
 
         // download element
         const dashboardElement = new DashboardElement(this.#page);

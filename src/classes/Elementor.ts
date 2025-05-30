@@ -27,6 +27,15 @@ export default class Elementor {
     });
   }
 
+  async waitForElementRemovedIfExists(selector: string) {
+    try {
+      await this.#page.waitForSelector(selector, {
+        hidden: true,
+        timeout: 1,
+      });
+    } catch {}
+  }
+
   async scrollIntoView(element: ElementHandle) {
     await this.#page.evaluate((element) => {
       element.scrollIntoView();

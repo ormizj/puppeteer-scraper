@@ -15,6 +15,7 @@ export default class DashboardElement {
   readonly #SIZE_SELECTOR = "section button.ring-neutral-700";
   readonly #SIZE_RATIO_SELECTOR = "label";
   readonly #SIZE_RESOLUTION_SELECTOR = "label + span";
+
   /* METADATA */
   readonly #METADATA_CONTAINER_SELECTOR = "section section";
   // NEGATIVE
@@ -22,13 +23,18 @@ export default class DashboardElement {
   readonly #NEGATIVE_SELECTOR = "textarea";
   // SAMPLING
   readonly #SAMPLING_STEPS_INDEX = 1;
+  readonly #SAMPLING_STEPS_SELECTOR = "div > div > input";
   readonly #SAMPLING_METHOD_INDEX = 2;
+  readonly #SAMPLING_METHOD_SELECTOR = "input";
   // CFG
   readonly #CFG_INDEX = 3;
+  readonly #CFG_STEPS_SELECTOR = "div > div > input";
   // SEED
   readonly #SEED_INDEX = 4;
+  readonly #SEED_STEPS_SELECTOR = "input";
   // VAE
   readonly #VAE_INDEX = 5;
+  readonly #VAE_STEPS_SELECTOR = "input";
   /* METADATA */
 
   readonly #elementor: Elementor;
@@ -134,13 +140,10 @@ export default class DashboardElement {
     };
   }
 
-  // TODO & below
   private async getNegative() {
     const negativeContainer = await this.getMetaDataContainer(
       this.#NEGATIVE_INDEX,
     );
-    console.log(negativeContainer, "@@@");
-    console.log(this.#NEGATIVE_INDEX, "$$$");
     const negative = await this.#elementor.getText(
       negativeContainer,
       this.#NEGATIVE_SELECTOR,
@@ -157,22 +160,56 @@ export default class DashboardElement {
     const samplingStepsContainer = await this.getMetaDataContainer(
       this.#SAMPLING_STEPS_INDEX,
     );
-    return {};
+    const method = await this.#elementor.getProperty(
+      samplingMethodContainer,
+      this.#SAMPLING_METHOD_SELECTOR,
+      "value",
+    );
+    const steps = await this.#elementor.getProperty(
+      samplingStepsContainer,
+      this.#SAMPLING_STEPS_SELECTOR,
+      "value",
+    );
+    return {
+      method,
+      steps,
+    };
   }
 
   private async getCfg() {
     const cfgContainer = await this.getMetaDataContainer(this.#CFG_INDEX);
-    return {};
+    const cfg = await this.#elementor.getProperty(
+      cfgContainer,
+      this.#CFG_STEPS_SELECTOR,
+      "value",
+    );
+    return {
+      cfg,
+    };
   }
 
   private async getSeed() {
     const seedContainer = await this.getMetaDataContainer(this.#SEED_INDEX);
-    return {};
+    const seed = await this.#elementor.getProperty(
+      seedContainer,
+      this.#SEED_STEPS_SELECTOR,
+      "value",
+    );
+    return {
+      seed,
+    };
   }
 
   private async getVaeModel() {
     const vaeContainer = await this.getMetaDataContainer(this.#VAE_INDEX);
-    return {};
+    const vae = await this.#elementor.getProperty(
+      vaeContainer,
+      this.#VAE_STEPS_SELECTOR,
+      "value",
+    );
+    return {
+      vae,
+    };
   }
 
   private async getMetaDataContainer(at: number): Promise<ElementHandle> {
