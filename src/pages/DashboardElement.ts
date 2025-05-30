@@ -11,15 +11,28 @@ export default class DashboardElement {
   readonly #LORA_ELEMENT_SELECTOR = "div.rounded-xl:has(a)";
   readonly #LORA_SELECTOR = "a";
   readonly #LORA_WEIGHT_SELECTOR = "span+div>input";
-  /* METADATA */
-  readonly #METADATA_CONTAINER_SELECTOR = "section:has(section)";
   // SIZE
   readonly #SIZE_SELECTOR = "section button.ring-neutral-700";
   readonly #SIZE_RATIO_SELECTOR = "label";
   readonly #SIZE_RESOLUTION_SELECTOR = "label + span";
   /* METADATA */
+  readonly #METADATA_CONTAINER_SELECTOR = "section section";
+  // NEGATIVE
+  readonly #NEGATIVE_INDEX = 0;
+  readonly #NEGATIVE_SELECTOR = "textarea";
+  // SAMPLING
+  readonly #SAMPLING_STEPS_INDEX = 1;
+  readonly #SAMPLING_METHOD_INDEX = 2;
+  // CFG
+  readonly #CFG_INDEX = 3;
+  // SEED
+  readonly #SEED_INDEX = 4;
+  // VAE
+  readonly #VAE_INDEX = 5;
+  /* METADATA */
 
   readonly #elementor: Elementor;
+  #metaDataContainer: ElementHandle[];
 
   constructor(page: Page) {
     this.#elementor = new Elementor(page);
@@ -121,33 +134,54 @@ export default class DashboardElement {
     };
   }
 
+  // TODO & below
   private async getNegative() {
-    const metaDataContainer = await this.getMetaDataContainer();
-    return {};
+    const negativeContainer = await this.getMetaDataContainer(
+      this.#NEGATIVE_INDEX,
+    );
+    console.log(negativeContainer, "@@@");
+    console.log(this.#NEGATIVE_INDEX, "$$$");
+    const negative = await this.#elementor.getText(
+      negativeContainer,
+      this.#NEGATIVE_SELECTOR,
+    );
+    return {
+      negative,
+    };
   }
 
   private async getSampling() {
-    const metaDataContainer = await this.getMetaDataContainer();
+    const samplingMethodContainer = await this.getMetaDataContainer(
+      this.#SAMPLING_METHOD_INDEX,
+    );
+    const samplingStepsContainer = await this.getMetaDataContainer(
+      this.#SAMPLING_STEPS_INDEX,
+    );
     return {};
   }
 
   private async getCfg() {
-    const metaDataContainer = await this.getMetaDataContainer();
+    const cfgContainer = await this.getMetaDataContainer(this.#CFG_INDEX);
     return {};
   }
 
   private async getSeed() {
-    const metaDataContainer = await this.getMetaDataContainer();
+    const seedContainer = await this.getMetaDataContainer(this.#SEED_INDEX);
     return {};
   }
 
   private async getVaeModel() {
-    const metaDataContainer = await this.getMetaDataContainer();
+    const vaeContainer = await this.getMetaDataContainer(this.#VAE_INDEX);
     return {};
   }
 
-  private async getMetaDataContainer(): Promise<ElementHandle> {
-    return await this.#elementor.getElement(this.#METADATA_CONTAINER_SELECTOR);
+  private async getMetaDataContainer(at: number): Promise<ElementHandle> {
+    if (!this.#metaDataContainer) {
+      this.#metaDataContainer = await this.#elementor.getElements(
+        this.#METADATA_CONTAINER_SELECTOR,
+      );
+    }
+    return this.#metaDataContainer[at];
   }
 
   // private download() {
