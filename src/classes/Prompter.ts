@@ -5,6 +5,10 @@ export default class Prompter {
   private readonly menuOptions: PromptOption[] = [
     { key: "scrape", description: "Start web scraping process" },
     {
+      key: "failed-records",
+      description: "Display entries failed to scrape",
+    },
+    {
       key: "show-duplicates",
       description: "Display duplicate scraped data entries",
     },

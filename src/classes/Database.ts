@@ -16,18 +16,20 @@ export default class Database {
   initialize() {
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS downloaded_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        uid TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                                                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                   uid TEXT NOT NULL,
+                                                   success BOOLEAN DEFAULT FALSE,
+                                                   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `;
     this.#db.exec(createTableQuery);
 
-    const createUidIndexQuery = `
+    const createIndexQuery = `
       CREATE INDEX IF NOT EXISTS idx_uid ON downloaded_data(uid);
       CREATE INDEX IF NOT EXISTS idx_created_at ON downloaded_data(created_at);
+      CREATE INDEX IF NOT EXISTS idx_success ON downloaded_data(success);
     `;
-    this.#db.exec(createUidIndexQuery);
+    this.#db.exec(createIndexQuery);
   }
 
   insertRecord(uid: string) {
@@ -51,6 +53,33 @@ export default class Database {
 
       const record = selectQuery.get(uid);
       return record ? record : null;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  getAllFailedRecords() {
+    try {
+      const selectFailedQuery = this.#db.prepare<[], DownloadedData[]>(`
+        SELECT * FROM downloaded_data WHERE success = FALSE ORDER BY created_at DESC
+      `);
+
+      return selectFailedQuery.all();
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  updateRecordSuccess(uid: string, success: boolean) {
+    try {
+      const updateQuery = this.#db.prepare<[boolean, string], void>(`
+        UPDATE downloaded_data SET success = ? WHERE uid = ?
+      `);
+
+      const result = updateQuery.run(success, uid);
+      return result.changes > 0;
     } catch (e) {
       console.error(e);
       throw e;

@@ -46,7 +46,7 @@ export default class Dashboard {
       this.#CONTENT_CONTAINER_SELECTOR,
     );
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
-    await this.#elementor.enableSlowNetwork();
+    // await this.#elementor.enableSlowNetwork();
 
     let processed: number;
     do {

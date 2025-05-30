@@ -4,6 +4,7 @@ import Prompter from "./classes/Prompter.ts";
 import scrape from "./commands/scrape.ts";
 import showDuplicates from "./commands/showDuplicates.ts";
 import resetDatabase from "./commands/resetDatabase.ts";
+import showFailed from "./commands/showFailed.ts";
 
 const main = async () => {
   let pluginsCleanupFn: () => void;
@@ -16,6 +17,9 @@ const main = async () => {
     switch (answer) {
       case "scrape":
         await scrape();
+        break;
+      case "failed-records":
+        await showFailed();
         break;
       case "show-duplicates":
         await showDuplicates();
