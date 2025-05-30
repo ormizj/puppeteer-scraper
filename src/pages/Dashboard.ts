@@ -26,7 +26,8 @@ export default class Dashboard {
    */
   readonly #CONTENT_CONTAINER_DATA_ID_SELECTOR = "img";
   readonly #INFORMATION_EXPAND_BUTTON = "header>button.absolute";
-  readonly #LOADER_SELECTOR = ".absolute.inset-0";
+  readonly #LOADER_SELECTOR =
+    ".w-5.h-5.absolute.inset-0.m-auto,.MuiCircularProgress-root";
 
   readonly #page: Page;
   readonly #elementor: Elementor;
