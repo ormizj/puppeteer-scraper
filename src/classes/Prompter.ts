@@ -56,7 +56,11 @@ export default class Prompter {
   }
 
   private validateAnswer(selectedIndex: number) {
-    if (selectedIndex < 0 || selectedIndex > this.menuOptions.length - 1) {
+    if (
+      isNaN(selectedIndex) ||
+      selectedIndex < 0 ||
+      selectedIndex > this.menuOptions.length - 1
+    ) {
       throw new Error("Invalid selection. Please try again");
     }
   }
@@ -87,7 +91,6 @@ export default class Prompter {
 
   private initializeReadline() {
     return readline.createInterface({
-      terminal: false,
       input,
       output,
     });
