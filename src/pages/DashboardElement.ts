@@ -1,4 +1,4 @@
-import type { Page } from "puppeteer";
+import type { ElementHandle, Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
 
 export default class DashboardElement {
@@ -11,8 +11,13 @@ export default class DashboardElement {
   readonly #LORA_ELEMENT_SELECTOR = "div.rounded-xl:has(a)";
   readonly #LORA_SELECTOR = "a";
   readonly #LORA_WEIGHT_SELECTOR = "span+div>input";
-  // METADATA
-  readonly #ATTRIBUTES_CONTAINER_SELECTOR = "section:has(section)";
+  /* METADATA */
+  readonly #METADATA_CONTAINER_SELECTOR = "section:has(section)";
+  // SIZE
+  readonly #SIZE_SELECTOR = "section button.ring-neutral-700";
+  readonly #SIZE_RATIO_SELECTOR = "label";
+  readonly #SIZE_RESOLUTION_SELECTOR = "label + span";
+  /* METADATA */
 
   readonly #elementor: Elementor;
 
@@ -99,27 +104,50 @@ export default class DashboardElement {
   }
 
   private async getSize() {
-    return {};
+    const sizeElement = await this.#elementor.getElement(this.#SIZE_SELECTOR);
+    const ratio = await this.#elementor.getText(
+      sizeElement,
+      this.#SIZE_RATIO_SELECTOR,
+    );
+    const resolution = await this.#elementor.getText(
+      sizeElement,
+      this.#SIZE_RESOLUTION_SELECTOR,
+    );
+    return {
+      size: {
+        ratio,
+        resolution,
+      },
+    };
   }
 
   private async getNegative() {
+    const metaDataContainer = await this.getMetaDataContainer();
     return {};
   }
 
   private async getSampling() {
+    const metaDataContainer = await this.getMetaDataContainer();
     return {};
   }
 
   private async getCfg() {
+    const metaDataContainer = await this.getMetaDataContainer();
     return {};
   }
 
   private async getSeed() {
+    const metaDataContainer = await this.getMetaDataContainer();
     return {};
   }
 
   private async getVaeModel() {
+    const metaDataContainer = await this.getMetaDataContainer();
     return {};
+  }
+
+  private async getMetaDataContainer(): Promise<ElementHandle> {
+    return await this.#elementor.getElement(this.#METADATA_CONTAINER_SELECTOR);
   }
 
   // private download() {
