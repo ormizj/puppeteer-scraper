@@ -63,20 +63,31 @@ export default class DashboardElement {
   private async getAllData() {
     return {
       ...(await this.getPrompt()),
-      ...(await this.getModel()),
-      ...(await this.getLora()),
       ...(await this.getSize()),
       ...(await this.getNegative()),
       ...(await this.getSampling()),
       ...(await this.getCfg()),
       ...(await this.getSeed()),
       ...(await this.getVaeModel()),
+      /* slow elements */
+      ...(await this.getModel()), // fastest
+      ...(await this.getLora()), // intermediate
+      ...(await this.getImages()), // slowest
+      /* slow elements */
     };
   }
 
   private async getPrompt() {
     return {
       prompt: await this.#elementor.getText(this.#PROMPT_SELECTOR),
+    };
+  }
+
+  // TODO
+  private async getImages() {
+    const images: string[] = [];
+    return {
+      images,
     };
   }
 
@@ -96,6 +107,7 @@ export default class DashboardElement {
 
   private async getLora() {
     try {
+      // retry mechanism, container is loaded, but actual elements are not (and are also not mandatory)
       return await retryHandler(
         () => this.getLoraHelper(),
         100,
