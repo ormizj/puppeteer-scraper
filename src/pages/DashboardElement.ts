@@ -83,7 +83,7 @@ export default class DashboardElement {
     };
   }
 
-  // TODO
+  // TODO implement
   private async getImages() {
     const images: string[] = [];
     return {
