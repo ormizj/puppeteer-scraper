@@ -13,6 +13,9 @@ export default class DashboardElement {
   readonly #LORA_ELEMENT_SELECTOR = "div.rounded-xl:has(a)";
   readonly #LORA_SELECTOR = "a";
   readonly #LORA_WEIGHT_SELECTOR = "span+div>input";
+  // IMAGE
+  readonly #IMAGE_LOADER = "main div > p";
+  readonly #IMAGE_SELECTOR = "main img";
   // SIZE
   readonly #SIZE_SELECTOR = "section button.ring-neutral-700";
   readonly #SIZE_RATIO_SELECTOR = "label";
@@ -62,6 +65,7 @@ export default class DashboardElement {
 
   private async getAllData() {
     return {
+      ...(await this.getImages()), // slowest element to load, waiter is reliable
       ...(await this.getPrompt()),
       ...(await this.getSize()),
       ...(await this.getNegative()),
@@ -69,11 +73,10 @@ export default class DashboardElement {
       ...(await this.getCfg()),
       ...(await this.getSeed()),
       ...(await this.getVaeModel()),
-      /* slow elements */
-      ...(await this.getModel()), // fastest
-      ...(await this.getLora()), // intermediate
-      ...(await this.getImages()), // slowest
-      /* slow elements */
+      /* slow elements with unreliable waiters */
+      ...(await this.getModel()), // fast load
+      ...(await this.getLora()), // slow load
+      /* slow elements with unreliable waiters */
     };
   }
 
@@ -83,9 +86,14 @@ export default class DashboardElement {
     };
   }
 
-  // TODO implement
   private async getImages() {
+    await this.#elementor.waitForElementsRemovedIfExists(this.#IMAGE_LOADER);
+    const imgElements = await this.#elementor.getElements(this.#IMAGE_SELECTOR);
     const images: string[] = [];
+    for (const element of imgElements) {
+      const link = await this.#elementor.getProperty(element, "src");
+      images.push(link);
+    }
     return {
       images,
     };
@@ -261,14 +269,15 @@ export default class DashboardElement {
         this.#METADATA_CONTAINER_SELECTOR,
       );
     }
-    return this.#metaDataContainer[at];
+    return this.#metaDataContainer.at(at);
   }
 
   // private download() {
   // 0. use download env (this function should be in a util class, not here)
+  // 0.5. place all failed downloads (check if fields are missing) in a "[FAILED]" directory, and update the database with the failed reason
   // 1. search for a folder %like% for category name
   // 2. hash the data (maybe readable) to create a subfolder
   // 3. place all the content with the same hash with the same folder
-  // 4. if folder is new, create a text containing the hash values (before hashing)
+  // 4. if folder is new, create a text containing the values used to hash in a txt file (before hashing)
   // }
 }

@@ -57,6 +57,16 @@ export default class Elementor {
     } catch {}
   }
 
+  async waitForElementsRemovedIfExists(selector: string) {
+    try {
+      const elements = await this.getElements(selector);
+      for (const _ of elements) {
+        console.log("element");
+        await this.waitForElementRemovedIfExists(selector);
+      }
+    } catch {}
+  }
+
   async scrollIntoView(element: ElementHandle) {
     await this.#page.evaluate((element) => {
       element.scrollIntoView();
