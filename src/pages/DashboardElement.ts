@@ -58,9 +58,6 @@ export default class DashboardElement {
     );
     console.log(this.#id);
     console.log(data);
-    console.log(
-      "====================================================================================================",
-    );
   }
 
   private async getAllData() {
@@ -75,7 +72,7 @@ export default class DashboardElement {
       ...(await this.getVaeModel()),
       /* slow elements with unreliable waiters */
       ...(await this.getModel()), // fast load
-      ...(await this.getLora()), // slow load
+      ...(await this.getLoras()), // slow load
       /* slow elements with unreliable waiters */
     };
   }
@@ -113,7 +110,7 @@ export default class DashboardElement {
     };
   }
 
-  private async getLora() {
+  private async getLoras() {
     try {
       // retry mechanism, container is loaded, but actual elements are not (and are also not mandatory)
       return await retryHandler(
@@ -128,7 +125,7 @@ export default class DashboardElement {
       const error = e as Error;
       console.warn(error.message);
       return {
-        lora: [],
+        loras: [],
       };
     }
   }
