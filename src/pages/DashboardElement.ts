@@ -2,6 +2,7 @@ import type { ElementHandle, Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
 import { retryHandler } from "../utils/RetryUtil.ts";
 import { sleep } from "../utils/ScraperUtil.ts";
+import Downloader from "../classes/Downloader.ts";
 
 export default class DashboardElement {
   // PROMPT
@@ -52,16 +53,23 @@ export default class DashboardElement {
   }
 
   async download() {
-    const data = await this.getAllData();
-    console.log(
-      "====================================================================================================",
-    );
-    console.log(this.#id);
-    console.log(data);
+    const downloader = new Downloader();
+    try {
+      const data = await this.getAllData();
+      await downloader.download(data);
+    } catch (e) {
+      const error = e as Error;
+      downloader.recordDownloadFailure(this.#id, error.message);
+    }
   }
 
+  /**
+   * @throws Error if any of the elements are not found
+   * @private
+   */
   private async getAllData() {
     return {
+      id: this.#id,
       ...(await this.getImages()), // slowest element to load, waiter is reliable
       ...(await this.getPrompt()),
       ...(await this.getSize()),
@@ -268,13 +276,4 @@ export default class DashboardElement {
     }
     return this.#metaDataContainer.at(at);
   }
-
-  // private download() {
-  // 0. use download env (this function should be in a util class, not here)
-  // 0.5. place all failed downloads (check if fields are missing) in a "[FAILED]" directory, and update the database with the failed reason
-  // 1. search for a folder %like% for category name
-  // 2. hash the data (maybe readable) to create a subfolder
-  // 3. place all the content with the same hash with the same folder
-  // 4. if folder is new, create a text containing the values used to hash in a txt file (before hashing)
-  // }
 }

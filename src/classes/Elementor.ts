@@ -1,5 +1,4 @@
 import { ElementHandle, Page } from "puppeteer";
-import { EnvConfig } from "../services/EnvConfig.ts";
 
 export default class Elementor {
   readonly #page: Page;
@@ -15,7 +14,7 @@ export default class Elementor {
       offline: false,
       downloadThroughput: (50 * 1024) / 8, // 50 KB/s
       uploadThroughput: (25 * 1024) / 8, // 25 KB/s
-      latency: 500, // 500ms latency
+      latency: 500, // 500 ms latency
     });
   }
 
