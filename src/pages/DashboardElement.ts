@@ -59,6 +59,7 @@ export default class DashboardElement {
       await downloader.download(data);
     } catch (e) {
       const error = e as Error;
+      console.error(error);
       downloader.recordDownloadFailure(this.#id, error.message);
     }
   }
