@@ -69,9 +69,7 @@ export default class Elementor {
           elementOrSelector,
         );
       }
-    } catch (e) {
-      console.log(e);
-    }
+    } catch {}
   }
 
   async waitForElementsRemovedIfExists(selector: string) {
