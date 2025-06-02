@@ -7,6 +7,7 @@ interface ConfigKeys {
   APP_WEBSITE_PASSWORD: string;
   APP_VIEWPORT_WIDTH: number;
   APP_VIEWPORT_HEIGHT: number;
+  APP_PUPPETEER_TIMEOUT: number;
   APP_DEBUG: boolean;
   APP_DEBUG_SLEEP: number;
 }

@@ -1,4 +1,5 @@
 import { ElementHandle, Page } from "puppeteer";
+import { EnvConfig } from "../services/EnvConfig.ts";
 
 export default class Elementor {
   readonly #page: Page;
@@ -48,21 +49,36 @@ export default class Elementor {
     });
   }
 
-  async waitForElementRemovedIfExists(selector: string) {
+  async waitForElementRemovedIfExists(element: ElementHandle): Promise<void>;
+  async waitForElementRemovedIfExists(selector: string): Promise<void>;
+  async waitForElementRemovedIfExists(
+    elementOrSelector: string | ElementHandle,
+  ) {
     try {
-      await this.#page.waitForSelector(selector, {
-        hidden: true,
-        timeout: 1,
-      });
-    } catch {}
+      if (typeof elementOrSelector === "string") {
+        await this.#page.waitForSelector(elementOrSelector, {
+          hidden: true,
+          timeout: 1,
+        });
+      } else {
+        await this.#page.waitForFunction(
+          (element) => !element.isConnected,
+          {
+            timeout: EnvConfig.APP_PUPPETEER_TIMEOUT(),
+          },
+          elementOrSelector,
+        );
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async waitForElementsRemovedIfExists(selector: string) {
     try {
       const elements = await this.getElements(selector);
-      for (const _ of elements) {
-        console.log("element");
-        await this.waitForElementRemovedIfExists(selector);
+      for (const element of elements) {
+        await this.waitForElementRemovedIfExists(element);
       }
     } catch {}
   }

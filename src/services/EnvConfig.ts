@@ -57,6 +57,10 @@ export class EnvConfig {
     return this.getNumber("APP_VIEWPORT_HEIGHT");
   }
 
+  static APP_PUPPETEER_TIMEOUT(): number {
+    return this.getNumber("APP_PUPPETEER_TIMEOUT");
+  }
+
   static APP_DEBUG(): boolean {
     return this.getBoolean("APP_DEBUG");
   }
