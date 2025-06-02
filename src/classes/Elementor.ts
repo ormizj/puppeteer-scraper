@@ -63,9 +63,7 @@ export default class Elementor {
       } else {
         await this.#page.waitForFunction(
           (element) => !element.isConnected,
-          {
-            timeout: EnvConfig.APP_PUPPETEER_TIMEOUT(),
-          },
+          {},
           elementOrSelector,
         );
       }

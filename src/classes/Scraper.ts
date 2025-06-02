@@ -50,6 +50,7 @@ export default class Scraper {
 
   private async initPage(browser: Browser) {
     const page = await browser.pages().then((e) => e[0]);
+    page.setDefaultTimeout(EnvConfig.APP_PUPPETEER_TIMEOUT());
     await page.setViewport({
       width: EnvConfig.APP_VIEWPORT_WIDTH(),
       height: EnvConfig.APP_VIEWPORT_HEIGHT(),
