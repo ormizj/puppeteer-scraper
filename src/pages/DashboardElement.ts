@@ -123,7 +123,7 @@ export default class DashboardElement {
     try {
       // retry mechanism, container is loaded, but actual elements are not
       return await retryHandler(
-        () => this.getLoraHelper,
+        () => this.getLoraHelper(),
         100,
         async () => {
           await sleep(100);
