@@ -17,7 +17,7 @@ export default class Database {
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS downloaded_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        uid TEXT NOT NULL,
+        uid TEXT,
         failed BOOLEAN DEFAULT TRUE,
         failed_reason DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
