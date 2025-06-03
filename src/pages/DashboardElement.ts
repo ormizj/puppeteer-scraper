@@ -121,9 +121,9 @@ export default class DashboardElement {
 
   private async getLoras() {
     try {
-      // retry mechanism, container is loaded, but actual elements are not (and are also not mandatory)
+      // retry mechanism, container is loaded, but actual elements are not
       return await retryHandler(
-        () => this.getLoraHelper(),
+        () => this.getLoraHelper,
         100,
         async () => {
           await sleep(100);
@@ -152,7 +152,7 @@ export default class DashboardElement {
       throw new Error(`Failed to find LoRA for ID: ${this.#id}`);
     }
 
-    const lora = [] as {
+    const loras = [] as {
       name: string;
       link: string;
       weight: string;
@@ -169,14 +169,14 @@ export default class DashboardElement {
         this.#LORA_WEIGHT_SELECTOR,
         "value",
       );
-      lora.push({
+      loras.push({
         name,
         link,
         weight,
       });
     }
 
-    return { lora };
+    return { loras };
   }
 
   private async getSize() {
