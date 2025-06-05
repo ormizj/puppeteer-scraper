@@ -10,7 +10,7 @@ type DataType = UnwrapAsyncMethod<DashboardElement["getAllData"]>;
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
-  readonly #MISC_FOLDER_NAME = EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME();
+  readonly #FALLBACK_FOLDER = EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME();
 
   readonly #data: Partial<DataType>;
 
@@ -117,8 +117,8 @@ export default class Downloader {
       }
     }
 
-    // If no matching folder found, return a path in the misc folder
-    return path.join(this.#DOWNLOAD_PATH, this.#MISC_FOLDER_NAME, dataHash);
+    // if no matches, return the fallback folder
+    return path.join(this.#DOWNLOAD_PATH, this.#FALLBACK_FOLDER, dataHash);
   }
 
   private async searchForDataHash(
