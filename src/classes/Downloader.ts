@@ -31,13 +31,7 @@ export default class Downloader {
     db.close();
   }
 
-  // 0. use download env (this function should be in a util class, not here)
-  // 0.5. place all failed downloads (check if fields are missing) in a "[FAILED]" directory and update the database with the failed reason
-  // 1. search for a folder %like% for category name
-  // 1.5 if download can't find a proper directory, place in a "[MISC]" directory, with subdirectories for each category, with the same logic as "%like%" search
-  // 2. hash the data (maybe readable) to create subfolder
-  // 3. place all the content with the same hash with the same folder
-  // 4. if the folder is new, create a text containing the values used to hash in a txt file (before hashing)
+  // TODO if the folder is new, create a text containing the values used to hash in a txt file (before hashing)
   async download() {
     const data = this.#data;
     this.printDownloadData();
