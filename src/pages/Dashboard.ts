@@ -72,7 +72,7 @@ export default class Dashboard {
 
         // scroll and validate
         await this.#elementor.scrollIntoView(activator);
-        if (db.getRecordByUid(id)) continue;
+        if (db.getRecordByUidAndFailed(id, true)) continue;
         db.insertRecord(id);
 
         // do action

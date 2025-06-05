@@ -46,6 +46,20 @@ export default class Database {
     }
   }
 
+  getRecordByUidAndFailed(uid: string, failed: boolean) {
+    try {
+      const selectQuery = this.#db.prepare<[string, number], DownloadedData>(`
+        SELECT * FROM downloaded_data WHERE uid = ? AND failed = ?
+      `);
+
+      const record = selectQuery.get(uid, failed ? 1 : 0);
+      return record ? record : null;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
   getRecordByUid(uid: string) {
     try {
       const selectQuery = this.#db.prepare<string, DownloadedData>(`
