@@ -43,12 +43,9 @@ export default class Downloader {
 
     try {
       if (!this.validateData(data)) return;
-
       const dataHash = this.getDataHash(data);
       const imagePath = await this.getImagePath(data, dataHash);
-
-      console.log(imagePath);
-      // await downloadFromUrl(image);
+      await this.downloadImages(data.images, imagePath);
     } catch (e) {
       const error = e as Error;
       console.error(error);
@@ -78,7 +75,7 @@ export default class Downloader {
         .sort(),
     ].join(separator);
     // "sha512" is overkill for this use-case
-    return createHash("sha256").update(hashInput).digest("base64");
+    return createHash("sha256").update(hashInput).digest("base64url");
   }
 
   private async getImagePath(
@@ -109,8 +106,8 @@ export default class Downloader {
         if (matchingWord === undefined) continue;
 
         // check if dataHash exists within this folder
-        const folderPath = path.join(this.#DOWNLOAD_PATH, downloadFolderName);
-        const hashPath = await this.searchForDataHash(folderPath, dataHash);
+        const categoryPath = path.join(this.#DOWNLOAD_PATH, downloadFolderName);
+        const hashPath = await this.searchForDataHash(categoryPath, dataHash);
         if (!hashPath) continue;
 
         return hashPath;
@@ -122,36 +119,34 @@ export default class Downloader {
   }
 
   private async searchForDataHash(
-    folderPath: string,
+    categoryPath: string,
     dataHash: string,
   ): Promise<string | null> {
-    try {
-      const items = fs.readdirSync(folderPath, { withFileTypes: true });
+    const folderHashes = fs.readdirSync(categoryPath, { withFileTypes: true });
 
-      // First, check if there's a direct folder match for the datahash
-      for (const item of items) {
-        if (item.isDirectory() && item.name === dataHash) {
-          return path.join(folderPath, item.name);
-        }
-      }
-
-      // If no direct match, recursively search subdirectories
-      for (const item of items) {
-        if (item.isDirectory()) {
-          const subfolderPath = path.join(folderPath, item.name);
-          const result = await this.searchForDataHash(subfolderPath, dataHash);
-          if (result) {
-            return result;
-          }
-        }
-      }
-
-      // If datahash not found, return a new path in this folder
-      return path.join(folderPath, dataHash);
-    } catch (error) {
-      console.error("Error searching in folder:", folderPath, error);
-      return null;
+    // search for existing dataHash
+    for (const folderHash of folderHashes) {
+      if (!folderHash.isDirectory() || folderHash.name !== dataHash) continue;
+      return path.join(categoryPath, folderHash.name);
     }
+
+    // if dataHash not found, return a new path in this folder
+    return path.join(categoryPath, dataHash);
+  }
+
+  private async downloadImages(images: string[], downloadPath: string) {
+    for (const image of images) {
+      await downloadFromUrl(
+        image,
+        downloadPath,
+        this.getImageName(image),
+        "webp",
+      );
+    }
+  }
+
+  private getImageName(image: string): string {
+    return image.split("/").pop();
   }
 
   /**

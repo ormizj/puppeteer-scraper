@@ -24,9 +24,8 @@ export const downloadFromUrl = async (
   const buffer = Buffer.from(arrayBuffer);
 
   // ensure directory exists
-  const dir = path.dirname(downloadPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (!fs.existsSync(downloadPath)) {
+    fs.mkdirSync(downloadPath, { recursive: true });
   }
 
   const fullPath = path.join(
@@ -34,5 +33,4 @@ export const downloadFromUrl = async (
     `${downloadName}.${downloadExtension}`,
   );
   fs.writeFileSync(fullPath, buffer);
-  console.log(`Image downloaded: ${fullPath}`);
 };

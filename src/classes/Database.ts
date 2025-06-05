@@ -82,13 +82,13 @@ export default class Database {
   private updateRecordFailed(uid: string, failed: boolean, reason?: string) {
     try {
       const updateQuery = this.#db.prepare<
-        [boolean, string | null, string],
+        [number, string | null, string],
         void
       >(
         `UPDATE downloaded_data SET failed = ?, failed_reason = ? WHERE uid = ?`,
       );
       const result = updateQuery.run(
-        failed,
+        failed ? 1 : 0,
         failed ? reason || null : null,
         uid,
       );
