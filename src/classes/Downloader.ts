@@ -85,49 +85,40 @@ export default class Downloader {
     data: DataType,
     dataHash: string,
   ): Promise<string> {
-    // Extract all lora names for searching
+    // lora names
     const loraNames = data.loras.map((lora) => lora.name);
+    // download directory folder names
+    const directories = fs.readdirSync(this.#DOWNLOAD_PATH, {
+      withFileTypes: true,
+    });
+    const downloadFolderNames = directories
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name);
 
-    try {
-      // Read all directories in the download path
-      const directories = fs.readdirSync(this.#DOWNLOAD_PATH, {
-        withFileTypes: true,
-      });
-      const folderNames = directories
-        .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name);
+    // search for the relevant category
+    for (const loraName of loraNames) {
+      const loraWords = loraName.toLowerCase().split(/\s+/);
 
-      // Search for folders that contain any word from any lora name
-      for (const loraName of loraNames) {
-        const loraWords = loraName.toLowerCase().split(/\s+/);
+      for (const downloadFolderName of downloadFolderNames) {
+        const folderNameLower = downloadFolderName.toLowerCase();
 
-        for (const folderName of folderNames) {
-          const folderNameLower = folderName.toLowerCase();
+        // check if the folder name contains any word from the current lora
+        const matchingWord = loraWords.find((word) =>
+          folderNameLower.includes(word.toLowerCase()),
+        );
+        if (matchingWord === undefined) continue;
 
-          // Check if folder name contains any word from the current lora
-          const hasMatchingWord = loraWords.some((word) =>
-            folderNameLower.includes(word.toLowerCase()),
-          );
+        // check if dataHash exists within this folder
+        const folderPath = path.join(this.#DOWNLOAD_PATH, downloadFolderName);
+        const hashPath = await this.searchForDataHash(folderPath, dataHash);
+        if (!hashPath) continue;
 
-          if (hasMatchingWord) {
-            const folderPath = path.join(this.#DOWNLOAD_PATH, folderName);
-
-            // Search for datahash within this folder
-            const hashPath = await this.searchForDataHash(folderPath, dataHash);
-            if (hashPath) {
-              return hashPath;
-            }
-          }
-        }
+        return hashPath;
       }
-
-      // If no matching folder found, return a path in the misc folder
-      return path.join(this.#DOWNLOAD_PATH, this.#MISC_FOLDER_NAME, dataHash);
-    } catch (error) {
-      console.error("Error searching for image path:", error);
-      // Fallback to misc folder
-      return path.join(this.#DOWNLOAD_PATH, this.#MISC_FOLDER_NAME, dataHash);
     }
+
+    // If no matching folder found, return a path in the misc folder
+    return path.join(this.#DOWNLOAD_PATH, this.#MISC_FOLDER_NAME, dataHash);
   }
 
   private async searchForDataHash(
