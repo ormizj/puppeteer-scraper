@@ -1,4 +1,5 @@
 interface ConfigKeys {
+  APP_UNCATEGORIZED_FOLDER_NAME: string;
   APP_WEBSITE_URL: string;
   APP_WEBSITE_DASHBOARD_URL: string;
   APP_DATABASE_NAME: string;

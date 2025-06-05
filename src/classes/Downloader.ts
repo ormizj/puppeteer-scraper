@@ -1,11 +1,14 @@
 import DashboardElement from "../pages/DashboardElement.ts";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
+import { downloadFromUrl } from "../utils/DownloadUtil.ts";
+import { createHash } from "crypto";
 
 type DataType = UnwrapAsyncMethod<DashboardElement["getAllData"]>;
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
+  readonly #MISC_FOLDER_NAME = EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME();
 
   readonly #data: Partial<DataType>;
 
@@ -33,9 +36,14 @@ export default class Downloader {
   // 3. place all the content with the same hash with the same folder
   // 4. if the folder is new, create a text containing the values used to hash in a txt file (before hashing)
   async download() {
+    const data = this.#data;
     this.printDownloadData();
     try {
-      if (!this.validateData(this.#data)) return;
+      if (!this.validateData(data)) return;
+
+      const dataHash = this.getDataHash(data);
+
+      // await downloadFromUrl(image);
     } catch (e) {
       const error = e as Error;
       console.error(error);
@@ -43,7 +51,39 @@ export default class Downloader {
     }
   }
 
-  private validateData(data: Partial<DataType>): data is Required<DataType> {
+  private getDataHash(data: DataType): string {
+    // combine all data to a string
+    const separator = "|";
+    const hashInput = [
+      data.id,
+      data.prompt,
+      data.method,
+      data.steps,
+      data.cfg,
+      data.size.ratio,
+      data.size.resolution,
+      data.model.name,
+      data.model.link,
+      // process all loras
+      ...data.loras
+        .map(
+          (lora) =>
+            `${lora.name}${separator}${lora.link}${separator}${lora.weight}`,
+        )
+        .sort(),
+    ].join(separator);
+    // "sha512" is overkill for this use-case
+    return createHash("sha256").update(hashInput).digest("base64");
+  }
+
+  private async getImagePath(images: string[]) {}
+
+  /**
+   * @param data
+   * @private
+   * @throws Error if any of the fields are invalid
+   */
+  private validateData(data: Partial<DataType>): data is DataType {
     if (!data.id) throw new Error("No id found");
     if (!data.images) throw new Error("No images found");
     if (!data.prompt) throw new Error("No prompt found");
