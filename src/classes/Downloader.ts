@@ -4,13 +4,14 @@ import DashboardElement from "../pages/DashboardElement.ts";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
 import { downloadFromUrl } from "../utils/DownloadUtil.ts";
-import { createHash } from "crypto";
+import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 
 type DataType = UnwrapAsyncMethod<DashboardElement["getAllData"]>;
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
   readonly #FALLBACK_FOLDER = EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME();
+  readonly #SEPARATOR = "|";
 
   readonly #data: Partial<DataType>;
 
@@ -45,6 +46,7 @@ export default class Downloader {
       if (!this.validateData(data)) return;
       const dataHash = this.getDataHash(data);
       const imagePath = await this.getImagePath(data, dataHash);
+      console.log(imagePath);
       await this.downloadImages(data.images, imagePath);
       this.recordDownloadSuccess(data.id);
     } catch (e) {
@@ -56,7 +58,6 @@ export default class Downloader {
 
   private getDataHash(data: DataType): string {
     // combine all data to a string
-    const separator = "|";
     const hashInput = [
       data.id,
       data.prompt,
@@ -71,12 +72,12 @@ export default class Downloader {
       ...data.loras
         .map(
           (lora) =>
-            `${lora.name}${separator}${lora.link}${separator}${lora.weight}`,
+            `${lora.name}${this.#SEPARATOR}${lora.link}${this.#SEPARATOR}${lora.weight}`,
         )
         .sort(),
-    ].join(separator);
+    ].join(this.#SEPARATOR);
     // "sha512" is overkill for this use-case
-    return createHash("sha256").update(hashInput).digest("base64url");
+    return createSha256Base64UrlHash(hashInput);
   }
 
   private async getImagePath(
@@ -116,7 +117,15 @@ export default class Downloader {
     }
 
     // if no matches, return the fallback folder
-    return path.join(this.#DOWNLOAD_PATH, this.#FALLBACK_FOLDER, dataHash);
+    const hashedLorasName = createSha256Base64UrlHash(
+      loraNames.join(this.#SEPARATOR),
+    );
+    return path.join(
+      this.#DOWNLOAD_PATH,
+      this.#FALLBACK_FOLDER,
+      hashedLorasName,
+      dataHash,
+    );
   }
 
   private async searchForDataHash(
