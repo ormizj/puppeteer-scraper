@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import DashboardElement from "../pages/DashboardElement.ts";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
@@ -38,11 +40,14 @@ export default class Downloader {
   async download() {
     const data = this.#data;
     this.printDownloadData();
+
     try {
       if (!this.validateData(data)) return;
 
       const dataHash = this.getDataHash(data);
+      const imagePath = await this.getImagePath(data, dataHash);
 
+      console.log(imagePath);
       // await downloadFromUrl(image);
     } catch (e) {
       const error = e as Error;
@@ -76,7 +81,87 @@ export default class Downloader {
     return createHash("sha256").update(hashInput).digest("base64");
   }
 
-  private async getImagePath(images: string[]) {}
+  private async getImagePath(
+    data: DataType,
+    dataHash: string,
+  ): Promise<string> {
+    // Extract all lora names for searching
+    const loraNames = data.loras.map((lora) => lora.name);
+
+    try {
+      // Read all directories in the download path
+      const directories = fs.readdirSync(this.#DOWNLOAD_PATH, {
+        withFileTypes: true,
+      });
+      const folderNames = directories
+        .filter((dirent) => dirent.isDirectory())
+        .map((dirent) => dirent.name);
+
+      // Search for folders that contain any word from any lora name
+      for (const loraName of loraNames) {
+        const loraWords = loraName.toLowerCase().split(/\s+/);
+
+        for (const folderName of folderNames) {
+          const folderNameLower = folderName.toLowerCase();
+
+          // Check if folder name contains any word from the current lora
+          const hasMatchingWord = loraWords.some((word) =>
+            folderNameLower.includes(word.toLowerCase()),
+          );
+
+          if (hasMatchingWord) {
+            const folderPath = path.join(this.#DOWNLOAD_PATH, folderName);
+
+            // Search for datahash within this folder
+            const hashPath = await this.searchForDataHash(folderPath, dataHash);
+            if (hashPath) {
+              return hashPath;
+            }
+          }
+        }
+      }
+
+      // If no matching folder found, return a path in the misc folder
+      return path.join(this.#DOWNLOAD_PATH, this.#MISC_FOLDER_NAME, dataHash);
+    } catch (error) {
+      console.error("Error searching for image path:", error);
+      // Fallback to misc folder
+      return path.join(this.#DOWNLOAD_PATH, this.#MISC_FOLDER_NAME, dataHash);
+    }
+  }
+
+  private async searchForDataHash(
+    folderPath: string,
+    dataHash: string,
+  ): Promise<string | null> {
+    try {
+      const items = fs.readdirSync(folderPath, { withFileTypes: true });
+
+      // First, check if there's a direct folder match for the datahash
+      for (const item of items) {
+        if (item.isDirectory() && item.name === dataHash) {
+          return path.join(folderPath, item.name);
+        }
+      }
+
+      // If no direct match, recursively search subdirectories
+      for (const item of items) {
+        if (item.isDirectory()) {
+          const subfolderPath = path.join(folderPath, item.name);
+          const result = await this.searchForDataHash(subfolderPath, dataHash);
+          if (result) {
+            return result;
+          }
+        }
+      }
+
+      // If datahash not found, return a new path in this folder
+      return path.join(folderPath, dataHash);
+    } catch (error) {
+      console.error("Error searching in folder:", folderPath, error);
+      return null;
+    }
+  }
 
   /**
    * @param data
