@@ -7,7 +7,17 @@ type DataType = UnwrapAsyncMethod<DashboardElement["getAllData"]>;
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
 
-  constructor() {}
+  readonly #data: Partial<DataType>;
+
+  constructor(data: Partial<DataType>) {
+    this.#data = data;
+  }
+
+  recordDownloadSuccess(uid: string) {
+    const db = new Database();
+    db.updateRecordAsSuccess(uid);
+    db.close();
+  }
 
   recordDownloadFailure(uid: string, failureReason: string) {
     const db = new Database();
@@ -22,14 +32,14 @@ export default class Downloader {
   // 2. hash the data (maybe readable) to create subfolder
   // 3. place all the content with the same hash with the same folder
   // 4. if the folder is new, create a text containing the values used to hash in a txt file (before hashing)
-  async download(data: Partial<DataType>) {
-    this.printDownloadData(data);
+  async download() {
+    this.printDownloadData();
     try {
-      if (!this.validateData(data)) return;
+      if (!this.validateData(this.#data)) return;
     } catch (e) {
       const error = e as Error;
       console.error(error);
-      this.recordDownloadFailure(data.id, error.message);
+      this.recordDownloadFailure(this.#data.id, error.message);
     }
   }
 
@@ -59,10 +69,10 @@ export default class Downloader {
     return true;
   }
 
-  private printDownloadData(data: Partial<DataType>) {
+  private printDownloadData() {
     console.log(
       "====================================================================================================",
     );
-    console.dir(data);
+    console.dir(this.#data);
   }
 }

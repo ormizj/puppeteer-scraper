@@ -3,6 +3,7 @@ import Elementor from "../classes/Elementor.ts";
 import { retryHandler } from "../utils/RetryUtil.ts";
 import { sleep } from "../utils/ScraperUtil.ts";
 import Downloader from "../classes/Downloader.ts";
+import Database from "../classes/Database.ts";
 
 export default class DashboardElement {
   // PROMPT
@@ -53,14 +54,16 @@ export default class DashboardElement {
   }
 
   async download() {
-    const downloader = new Downloader();
     try {
       const data = await this.getAllData();
-      await downloader.download(data);
+      const downloader = new Downloader(data);
+      await downloader.download();
     } catch (e) {
       const error = e as Error;
       console.error(error);
-      downloader.recordDownloadFailure(this.#id, error.message);
+      const db = new Database();
+      db.updateRecordAsFail(this.#id, error.message);
+      db.close();
     }
   }
 
