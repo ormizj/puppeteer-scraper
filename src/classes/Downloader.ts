@@ -39,8 +39,8 @@ export default class Downloader {
       const dataHash = this.getDataHash(data);
       const imagePath = await this.getImagePath(data, dataHash);
       await this.generateMetaData(data, imagePath);
-      // await this.downloadImages(data.images, imagePath);
-      // this.recordDownloadSuccess(data.id);
+      await this.downloadImages(data.images, imagePath);
+      this.recordDownloadSuccess(data.id);
     } catch (e) {
       const error = e as Error;
       console.error(error);
