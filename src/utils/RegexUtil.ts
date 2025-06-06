@@ -52,3 +52,8 @@ export const testInvalidFileName = (name: string): boolean => {
   // length
   return name.length <= 255;
 };
+
+export const sanitizeFileName = (name: string): string => {
+  const INVALID_FILENAME_CHARS = /[<>:"|?*\/\\\x00-\x1f.]/g;
+  return name.replace(INVALID_FILENAME_CHARS, "");
+};

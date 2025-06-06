@@ -10,6 +10,7 @@ import {
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
+import { sanitizeFileName } from "../utils/RegexUtil.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -97,8 +98,8 @@ export default class Downloader {
     dataHash: string,
     targetDirectory?: string,
   ): Promise<string> {
-    // lora names
-    const loraNames = data.loras.map((lora) => lora.name);
+    // get lora names and sanatize them for correct search
+    const loraNames = data.loras.map((lora) => sanitizeFileName(lora.name));
     // download directory folder names
     const directories = fs.readdirSync(this.#DOWNLOAD_PATH, {
       withFileTypes: true,
