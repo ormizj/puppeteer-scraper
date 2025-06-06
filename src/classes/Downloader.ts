@@ -5,6 +5,7 @@ import { EnvConfig } from "../services/EnvConfig.ts";
 import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
+import Prompter from "./Prompter.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -123,13 +124,24 @@ export default class Downloader {
       }
     }
 
-    // if no matches, return the fallback folder
+    // if no matches, ask user input
+    const prompter = new Prompter();
+    const selectedCategory = await prompter.promptCategory(
+      loraNames,
+      this.#FALLBACK_FOLDER,
+    );
+    if (selectedCategory !== this.#FALLBACK_FOLDER) {
+      generateDirectory(path.join(this.#DOWNLOAD_PATH, selectedCategory));
+      return await this.getImagePath(data, dataHash);
+    }
+
+    // generate the fallback path
     const hashedLorasName = createSha256Base64UrlHash(
       loraNames.join(this.#SEPARATOR),
     );
     return path.join(
       this.#DOWNLOAD_PATH,
-      this.#FALLBACK_FOLDER,
+      selectedCategory,
       hashedLorasName,
       dataHash,
     );
