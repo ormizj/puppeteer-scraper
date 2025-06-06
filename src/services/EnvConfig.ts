@@ -32,10 +32,6 @@ export class EnvConfig {
     return this.getBoolean("APP_LOG_DATA_TO_DOWNLOAD");
   }
 
-  static APP_UNCATEGORIZED_FOLDER_NAME(): string {
-    return this.getString("APP_UNCATEGORIZED_FOLDER_NAME");
-  }
-
   static APP_DATABASE_NAME(): string {
     return this.getString("APP_DATABASE_NAME");
   }

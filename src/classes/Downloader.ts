@@ -9,7 +9,6 @@ import Prompter from "./Prompter.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
-  readonly #FALLBACK_FOLDER = EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME();
   readonly #SEPARATOR = "|";
   readonly #META_DATA_FILE_NAME = "metadata";
 
@@ -104,13 +103,10 @@ export default class Downloader {
         const folderName = db.getDownloadMappingFileName(loraName);
         if (!folderName) continue;
 
-        // check if the folder exists and dataHash exists within it
+        // check if the folder exists return the path
         const categoryPath = path.join(this.#DOWNLOAD_PATH, folderName);
         if (fs.existsSync(categoryPath)) {
-          const hashPath = await this.searchForDataHash(categoryPath, dataHash);
-          if (hashPath) {
-            return hashPath;
-          }
+          return await this.searchForDataHash(categoryPath, dataHash);
         }
       }
 
@@ -119,10 +115,7 @@ export default class Downloader {
       const { dataKey, folderName } =
         await prompter.promptFolderMapping(loraNames);
       db.insertDownloadMapping(dataKey, folderName);
-
-      // create the folder and generate the path
-      const newPath = path.join(this.#DOWNLOAD_PATH, folderName);
-      return await this.searchForDataHash(newPath, dataHash);
+      return path.join(this.#DOWNLOAD_PATH, folderName, dataHash);
     } finally {
       db.close();
     }
