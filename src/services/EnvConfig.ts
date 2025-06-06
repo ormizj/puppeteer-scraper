@@ -28,6 +28,9 @@ export class EnvConfig {
   static APP_JITTER_BETWEEN_DOWNLOADS(): number {
     return this.getNumber("APP_JITTER_BETWEEN_DOWNLOADS");
   }
+  static APP_LOG_DATA_TO_DOWNLOAD(): boolean {
+    return this.getBoolean("APP_LOG_DATA_TO_DOWNLOAD");
+  }
 
   static APP_UNCATEGORIZED_FOLDER_NAME(): string {
     return this.getString("APP_UNCATEGORIZED_FOLDER_NAME");

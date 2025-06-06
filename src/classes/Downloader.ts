@@ -32,7 +32,9 @@ export default class Downloader {
 
   async download() {
     const data = this.#data;
-    this.printDownloadData();
+    if (EnvConfig.APP_LOG_DATA_TO_DOWNLOAD()) {
+      this.printDownloadData();
+    }
 
     try {
       if (!this.validateData(data)) return;

@@ -1,6 +1,7 @@
 interface ConfigKeys {
   APP_JITTER_BETWEEN_DOWNLOADS: number;
   APP_UNCATEGORIZED_FOLDER_NAME: string;
+  APP_LOG_DATA_TO_DOWNLOAD: boolean;
   APP_WEBSITE_URL: string;
   APP_WEBSITE_DASHBOARD_URL: string;
   APP_DATABASE_NAME: string;
