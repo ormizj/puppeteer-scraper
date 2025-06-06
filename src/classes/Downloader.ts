@@ -2,7 +2,11 @@ import fs from "fs";
 import path from "path";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
-import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
+import {
+  downloadFromUrl,
+  generateDirectory,
+  removeEmptyDirectory,
+} from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
@@ -91,6 +95,7 @@ export default class Downloader {
   private async getImagePath(
     data: ElementData,
     dataHash: string,
+    targetDirectory?: string,
   ): Promise<string> {
     // lora names
     const loraNames = data.loras.map((lora) => lora.name);
@@ -125,14 +130,16 @@ export default class Downloader {
     }
 
     // if no matches, ask user input
+    removeEmptyDirectory(targetDirectory); // if the user created a directory, but it doesn't match the category
     const prompter = new Prompter();
     const selectedCategory = await prompter.promptCategory(
       loraNames,
       this.#FALLBACK_FOLDER,
     );
     if (selectedCategory !== this.#FALLBACK_FOLDER) {
-      generateDirectory(path.join(this.#DOWNLOAD_PATH, selectedCategory));
-      return await this.getImagePath(data, dataHash);
+      const newPath = path.join(this.#DOWNLOAD_PATH, selectedCategory);
+      generateDirectory(newPath);
+      return await this.getImagePath(data, dataHash, newPath);
     }
 
     // generate the fallback path

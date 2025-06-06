@@ -32,8 +32,20 @@ export const downloadFromUrl = async (
   fs.writeFileSync(fullPath, buffer);
 };
 
-export const generateDirectory = (directoryPath: string) => {
+export const generateDirectory = (directoryPath: string): boolean => {
   if (!fs.existsSync(directoryPath)) {
     fs.mkdirSync(directoryPath, { recursive: true });
+    return true;
   }
+  return false;
+};
+
+export const removeEmptyDirectory = (directoryPath: string): boolean => {
+  if (!fs.existsSync(directoryPath)) {
+    return false;
+  }
+  const files = fs.readdirSync(directoryPath);
+  if (files.length) return false;
+  fs.rmdirSync(directoryPath);
+  return true;
 };
