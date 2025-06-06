@@ -92,7 +92,6 @@ export default class Downloader {
   private async getImagePath(
     data: ElementData,
     dataHash: string,
-    targetDirectory?: string,
   ): Promise<string> {
     const db = new Database();
 
