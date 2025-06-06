@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+/src/sandbox.ts
 
 # IDE and editor files
 .vscode/
