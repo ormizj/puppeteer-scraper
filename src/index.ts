@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { initializePlugins } from "./plugins/Plugins.ts";
+import plugins from "./plugins/Index.ts";
 import Prompter from "./classes/Prompter.ts";
 import scrape from "./commands/scrape.ts";
 import showDuplicates from "./commands/showDuplicates.ts";
@@ -9,9 +9,9 @@ import showFailed from "./commands/showFailed.ts";
 const main = async () => {
   let pluginsCleanupFn: () => void;
   try {
-    pluginsCleanupFn = initializePlugins();
+    pluginsCleanupFn = plugins();
 
-    // run script
+    // run the script
     const prompter = new Prompter();
     const answer = await prompter.promptMainMenu();
     switch (answer) {

@@ -42,12 +42,13 @@ export default class Dashboard {
 
   async downloadAll() {
     const db = new Database();
+
+    // wait for 1 second, then select the container
     await sleep(1000);
     const contentContainer = await this.#elementor.getElement(
       this.#CONTENT_CONTAINER_SELECTOR,
     );
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
-    // await this.#elementor.enableSlowNetwork();
 
     let processed: number;
     do {
