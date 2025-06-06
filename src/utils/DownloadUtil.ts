@@ -20,17 +20,20 @@ export const downloadFromUrl = async (
     throw new Error(`Failed to download image: ${response.statusText}`);
   }
 
-  const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  // ensure directory exists
-  if (!fs.existsSync(downloadPath)) {
-    fs.mkdirSync(downloadPath, { recursive: true });
-  }
-
+  // handle paths
+  generateDirectory(downloadPath);
   const fullPath = path.join(
     downloadPath,
     `${downloadName}.${downloadExtension}`,
   );
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
   fs.writeFileSync(fullPath, buffer);
+};
+
+export const generateDirectory = (directoryPath: string) => {
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
 };

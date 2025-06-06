@@ -2,8 +2,9 @@ import fs from "fs";
 import path from "path";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
-import { downloadFromUrl } from "../utils/DownloadUtil.ts";
+import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
+import Formatter from "./Formatter.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -48,27 +49,17 @@ export default class Downloader {
   }
 
   private async generateMetaData(data: ElementData, imagePath: string) {
-    const metadataPath = path.join(
-      imagePath,
-      `${this.#META_DATA_FILE_NAME}.json`,
-    );
-    const metadataTxtPath = path.join(
-      imagePath,
-      `${this.#META_DATA_FILE_NAME}.txt`,
-    );
+    const formatter = new Formatter(data);
 
-    const metadata = {
-      prompt: data.prompt,
-      method: data.method,
-    };
+    generateDirectory(imagePath);
 
-    if (!fs.existsSync(metadataPath)) {
-      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2), "utf8");
+    const jsonPath = path.join(imagePath, `${this.#META_DATA_FILE_NAME}.json`);
+    if (!fs.existsSync(jsonPath)) {
+      fs.writeFileSync(jsonPath, formatter.json(), "utf8");
     }
-
-    if (!fs.existsSync(metadataTxtPath)) {
-      const txtContent = `Prompt: ${metadata.prompt}\nMethod: ${metadata.method}`;
-      fs.writeFileSync(metadataTxtPath, txtContent, "utf8");
+    const txtPath = path.join(imagePath, `${this.#META_DATA_FILE_NAME}.txt`);
+    if (!fs.existsSync(txtPath)) {
+      fs.writeFileSync(txtPath, formatter.txt(), "utf8");
     }
   }
 
