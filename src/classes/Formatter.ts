@@ -41,9 +41,9 @@ export default class Formatter {
     lines.push(decorator);
     lines.push("");
 
-    // basic information
+    // basic
     lines.push(`ID: ${this.#data.id}`);
-    lines.push("");
+    lines.push(spacer);
 
     // prompt
     insertSubTitle("PROMPT INFORMATION");
@@ -55,13 +55,13 @@ export default class Formatter {
     lines.push(this.#data.negative);
     lines.push(spacer);
 
-    // model information
+    // model
     insertSubTitle("MODEL INFORMATION");
     lines.push(`Name: ${this.#data.model.name}`);
     lines.push(`Link: ${this.#data.model.link}`);
     lines.push(spacer);
 
-    // lora information
+    // lora
     insertSubTitle("LORA INFORMATION");
     this.#data.loras.forEach((lora, index) => {
       lines.push(`LoRA ${index + 1}:`);
@@ -73,7 +73,7 @@ export default class Formatter {
     lines.pop();
     lines.push(spacer);
 
-    // generation settings
+    // generation
     insertSubTitle("GENERATION SETTINGS");
     lines.push(`Method: ${this.#data.method}`);
     lines.push(`Steps: ${this.#data.steps}`);
@@ -82,7 +82,7 @@ export default class Formatter {
     lines.push(`VAE: ${this.#data.vae}`);
     lines.push(spacer);
 
-    // size information
+    // size
     insertSubTitle("SIZE INFORMATION");
     lines.push(`Ratio: ${this.#data.size.ratio}`);
     lines.push(`Resolution: ${this.#data.size.resolution}`);
