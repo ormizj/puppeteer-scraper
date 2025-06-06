@@ -1,21 +1,19 @@
 import fs from "fs";
 import path from "path";
-import DashboardElement from "../pages/DashboardElement.ts";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
 import { downloadFromUrl } from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 
-type DataType = UnwrapAsyncMethod<DashboardElement["getAllData"]>;
-
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
   readonly #FALLBACK_FOLDER = EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME();
   readonly #SEPARATOR = "|";
+  readonly #META_DATA_FILE_NAME = "metadata";
 
-  readonly #data: Partial<DataType>;
+  readonly #data: Partial<ElementData>;
 
-  constructor(data: Partial<DataType>) {
+  constructor(data: Partial<ElementData>) {
     this.#data = data;
   }
 
@@ -31,7 +29,6 @@ export default class Downloader {
     db.close();
   }
 
-  // TODO if the folder is new, create a text containing the values used to hash in a txt file (before hashing)
   async download() {
     const data = this.#data;
     this.printDownloadData();
@@ -40,9 +37,9 @@ export default class Downloader {
       if (!this.validateData(data)) return;
       const dataHash = this.getDataHash(data);
       const imagePath = await this.getImagePath(data, dataHash);
-      console.log(imagePath);
-      await this.downloadImages(data.images, imagePath);
-      this.recordDownloadSuccess(data.id);
+      await this.generateMetaData(data, imagePath);
+      // await this.downloadImages(data.images, imagePath);
+      // this.recordDownloadSuccess(data.id);
     } catch (e) {
       const error = e as Error;
       console.error(error);
@@ -50,7 +47,32 @@ export default class Downloader {
     }
   }
 
-  private getDataHash(data: DataType): string {
+  private async generateMetaData(data: ElementData, imagePath: string) {
+    const metadataPath = path.join(
+      imagePath,
+      `${this.#META_DATA_FILE_NAME}.json`,
+    );
+    const metadataTxtPath = path.join(
+      imagePath,
+      `${this.#META_DATA_FILE_NAME}.txt`,
+    );
+
+    const metadata = {
+      prompt: data.prompt,
+      method: data.method,
+    };
+
+    if (!fs.existsSync(metadataPath)) {
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2), "utf8");
+    }
+
+    if (!fs.existsSync(metadataTxtPath)) {
+      const txtContent = `Prompt: ${metadata.prompt}\nMethod: ${metadata.method}`;
+      fs.writeFileSync(metadataTxtPath, txtContent, "utf8");
+    }
+  }
+
+  private getDataHash(data: ElementData): string {
     // combine all data to a string
     const hashInput = [
       data.id,
@@ -75,7 +97,7 @@ export default class Downloader {
   }
 
   private async getImagePath(
-    data: DataType,
+    data: ElementData,
     dataHash: string,
   ): Promise<string> {
     // lora names
@@ -158,7 +180,7 @@ export default class Downloader {
    * @private
    * @throws Error if any of the fields are invalid
    */
-  private validateData(data: Partial<DataType>): data is DataType {
+  private validateData(data: Partial<ElementData>): data is ElementData {
     if (!data.id) throw new Error("No id found");
     if (!data.images) throw new Error("No images found");
     if (!data.prompt) throw new Error("No prompt found");

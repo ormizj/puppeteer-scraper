@@ -71,7 +71,7 @@ export default class DashboardElement {
    * @throws Error if any of the elements are not found
    * @private
    */
-  private async getAllData() {
+  private async getAllData(): Promise<ElementData> {
     return {
       id: this.#id,
       ...(await this.getImages()), // slowest element to load, waiter is reliable
