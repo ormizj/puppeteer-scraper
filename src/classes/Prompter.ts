@@ -14,7 +14,8 @@ export default class Prompter {
     },
     {
       key: "reset-database",
-      description: "Reset all scrapped data entries from the Database",
+      description:
+        "Reset all scrapped data and mapping entries from the Database",
     },
     { key: "exit", description: "Exit the application" },
   ];
@@ -50,54 +51,46 @@ export default class Prompter {
     return selectedOption;
   }
 
-  async promptCategory(
-    names: string[],
-    fallbackCategory: string,
-  ): Promise<string> {
+  async promptFolderMapping(
+    categoryNames: string[],
+  ): Promise<{ dataKey: string; folderName: string }> {
     // print title
     console.log("");
-    console.log(this.generateTitle("Names"));
-    names.forEach((name, index) => {
+    console.log(this.generateTitle("Available Categories"));
+    categoryNames.forEach((name, index) => {
       console.log(`${index + 1}. ${name}`);
     });
     console.log("");
 
-    // prompt user
-    const choices = [
-      {
-        name: "Create new category",
-        value: "new-category",
-      },
-      {
-        name: `Use default category: "${fallbackCategory}"`,
-        value: fallbackCategory,
-      },
-    ];
-    const { categoryChoice } = await inquirer.prompt([
+    // get category
+    const categoryChoices = categoryNames.map((name, index) => ({
+      name: `${index + 1}. ${name}`,
+      value: name,
+    }));
+    const { selectedCategory } = await inquirer.prompt([
       {
         type: "list",
-        name: "categoryChoice",
-        message: "No matching category found. What would you like to do?",
-        choices,
+        name: "selectedCategory",
+        message: "Select which category to map to a folder:",
+        choices: categoryChoices,
       },
     ]);
 
-    // fallback category
-    if (categoryChoice !== "new-category") return categoryChoice;
-
-    // new category
-    const { newCategoryName } = await inquirer.prompt([
+    // get folder name
+    const { folderName } = await inquirer.prompt([
       {
         type: "input",
-        name: "newCategoryName",
-        message: "Enter the name of the new category:",
+        name: "folderName",
+        message: `Enter the folder name for "${selectedCategory}":\n`,
         validate: (input: string) => {
-          if (!testInvalidFileName(input)) return "Category name is invalid";
+          if (!testInvalidFileName(input)) return "Folder name is invalid";
+          if (input.trim().length === 0) return "Folder name cannot be empty";
           return true;
         },
       },
     ]);
-    return newCategoryName.trim();
+
+    return { dataKey: selectedCategory, folderName: folderName.trim() };
   }
 
   private generateTitle(title: string): string {

@@ -2,15 +2,10 @@ import fs from "fs";
 import path from "path";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
-import {
-  downloadFromUrl,
-  generateDirectory,
-  removeEmptyDirectory,
-} from "../utils/DownloadUtil.ts";
+import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
-import { sanitizeFileName } from "../utils/RegexUtil.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -99,61 +94,39 @@ export default class Downloader {
     dataHash: string,
     targetDirectory?: string,
   ): Promise<string> {
-    // get lora names and sanatize them for correct search
-    const loraNames = data.loras.map((lora) => sanitizeFileName(lora.name));
-    // download directory folder names
-    const directories = fs.readdirSync(this.#DOWNLOAD_PATH, {
-      withFileTypes: true,
-    });
-    const downloadFolderNames = directories
-      .filter((dirent) => dirent.isDirectory())
-      .map((dirent) => dirent.name);
+    const db = new Database();
 
-    // search for the relevant category
-    for (const loraName of loraNames) {
-      const loraWords = loraName.toLowerCase().split(/\s+/);
+    try {
+      // get lora names
+      const loraNames = data.loras.map((lora) => lora.name);
 
-      for (const downloadFolderName of downloadFolderNames) {
-        const folderNameLower = downloadFolderName.toLowerCase();
+      // check if any lora has a mapping in the database
+      for (const loraName of loraNames) {
+        const folderName = db.getDownloadMappingFileName(loraName);
+        if (!folderName) continue;
 
-        // check if the folder name contains any word from the current lora
-        const matchingWord = loraWords.find((word) =>
-          folderNameLower.includes(word.toLowerCase()),
-        );
-        if (matchingWord === undefined) continue;
-
-        // check if dataHash exists within this folder
-        const categoryPath = path.join(this.#DOWNLOAD_PATH, downloadFolderName);
-        const hashPath = await this.searchForDataHash(categoryPath, dataHash);
-        if (!hashPath) continue;
-
-        return hashPath;
+        // check if the folder exists and dataHash exists within it
+        const categoryPath = path.join(this.#DOWNLOAD_PATH, folderName);
+        if (fs.existsSync(categoryPath)) {
+          const hashPath = await this.searchForDataHash(categoryPath, dataHash);
+          if (hashPath) {
+            return hashPath;
+          }
+        }
       }
-    }
 
-    // if no matches, ask user input
-    removeEmptyDirectory(targetDirectory); // if the user created a directory, but it doesn't match the category
-    const prompter = new Prompter();
-    const selectedCategory = await prompter.promptCategory(
-      loraNames,
-      this.#FALLBACK_FOLDER,
-    );
-    if (selectedCategory !== this.#FALLBACK_FOLDER) {
-      const newPath = path.join(this.#DOWNLOAD_PATH, selectedCategory);
-      generateDirectory(newPath);
-      return await this.getImagePath(data, dataHash, newPath);
-    }
+      // if no mapping found, create one
+      const prompter = new Prompter();
+      const { dataKey, folderName } =
+        await prompter.promptFolderMapping(loraNames);
+      db.insertDownloadMapping(dataKey, folderName);
 
-    // generate the fallback path
-    const hashedLorasName = createSha256Base64UrlHash(
-      loraNames.join(this.#SEPARATOR),
-    );
-    return path.join(
-      this.#DOWNLOAD_PATH,
-      selectedCategory,
-      hashedLorasName,
-      dataHash,
-    );
+      // create the folder and generate the path
+      const newPath = path.join(this.#DOWNLOAD_PATH, folderName);
+      return await this.searchForDataHash(newPath, dataHash);
+    } finally {
+      db.close();
+    }
   }
 
   private async searchForDataHash(

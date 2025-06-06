@@ -14,6 +14,7 @@ export default class Database {
   }
 
   initialize() {
+    // download_table
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS downloaded_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,12 +27,52 @@ export default class Database {
     `;
     this.#db.exec(createTableQuery);
 
+    // download_map
+    const createDownloadMapTableQuery = `
+      CREATE TABLE IF NOT EXISTS download_map (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        data_key TEXT UNIQUE NOT NULL,
+        folder_name TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    this.#db.exec(createDownloadMapTableQuery);
+
+    // index
     const createIndexQuery = `
       CREATE INDEX IF NOT EXISTS idx_uid ON downloaded_data(uid);
       CREATE INDEX IF NOT EXISTS idx_created_at ON downloaded_data(created_at);
       CREATE INDEX IF NOT EXISTS idx_failed ON downloaded_data(failed);
+      CREATE INDEX IF NOT EXISTS idx_data_key ON download_map(data_key);
     `;
     this.#db.exec(createIndexQuery);
+  }
+
+  getDownloadMappingFileName(dataKey: string): string | null {
+    try {
+      const selectQuery = this.#db.prepare<string, DownloadMap>(`
+        SELECT data_key, folder_name FROM download_map WHERE data_key = ?
+      `);
+
+      const record = selectQuery.get(dataKey);
+      return record ? record.folder_name : null;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  insertDownloadMapping(dataKey: string, folderName: string) {
+    try {
+      const insertQuery = this.#db.prepare<[string, string], DownloadMap>(`
+        INSERT OR REPLACE INTO download_map (data_key, folder_name) VALUES (?, ?)
+      `);
+
+      return insertQuery.run(dataKey, folderName);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   }
 
   insertRecord(uid: string) {
@@ -168,15 +209,25 @@ export default class Database {
 
   resetDatabase() {
     try {
-      // delete all records
-      const deleteQuery = this.#db.prepare(`DELETE FROM downloaded_data`);
-      deleteQuery.run();
+      // delete all records from both tables
+      const deleteDownloadedDataQuery = this.#db.prepare(
+        `DELETE FROM downloaded_data`,
+      );
+      deleteDownloadedDataQuery.run();
+      const deleteDownloadMapQuery = this.#db.prepare(
+        `DELETE FROM download_map`,
+      );
+      deleteDownloadMapQuery.run();
 
-      // set auto increment to 1
-      const resetAutoIncrementQuery = this.#db.prepare(`
-      DELETE FROM sqlite_sequence WHERE name = 'downloaded_data'
-    `);
-      resetAutoIncrementQuery.run();
+      // reset auto increment for both tables
+      const resetDownloadedDataAutoIncrementQuery = this.#db.prepare(`
+        DELETE FROM sqlite_sequence WHERE name = 'downloaded_data'
+      `);
+      resetDownloadedDataAutoIncrementQuery.run();
+      const resetDownloadMapAutoIncrementQuery = this.#db.prepare(`
+        DELETE FROM sqlite_sequence WHERE name = 'download_map'
+      `);
+      resetDownloadMapAutoIncrementQuery.run();
     } catch (e) {
       console.error(e);
       throw e;
