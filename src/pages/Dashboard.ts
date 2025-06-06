@@ -6,14 +6,14 @@ import DashboardElement from "./DashboardElement.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
 
 export default class Dashboard {
-  readonly #CONTENT_CONTAINER_SELECTOR = "[data-test-id=virtuoso-scroller]";
+  readonly #CONTENT_CONTAINER_SELECTOR = "[data-testid=virtuoso-scroller]";
   /**
    * Used within the content container.
    *
    * @see CONTENT_CONTAINER_SELECTOR
    */
   readonly #CONTENT_CONTAINER_DATA_SELECTOR =
-    "[data-test-id=virtuoso-scroller] [data-test-id=virtuoso-item-list] > :not(.whitespace-nowrap)";
+    "[data-testid=virtuoso-item-list] > div:not(.whitespace-nowrap)";
   /**
    * Used within the data selector.
    *
