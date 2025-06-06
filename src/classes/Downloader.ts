@@ -32,9 +32,7 @@ export default class Downloader {
 
   async download() {
     const data = this.#data;
-    if (EnvConfig.APP_LOG_DATA_TO_DOWNLOAD()) {
-      this.printDownloadData();
-    }
+    EnvConfig.APP_LOG_DATA_TO_DOWNLOAD() ? this.printData() : this.printId();
 
     try {
       if (!this.validateData(data)) return;
@@ -199,10 +197,12 @@ export default class Downloader {
     return true;
   }
 
-  private printDownloadData() {
-    console.log(
-      "====================================================================================================",
-    );
+  private printData() {
+    console.log("=".repeat(50));
     console.dir(this.#data);
+  }
+
+  private printId() {
+    console.log(`ID: ${this.#data.id}`);
   }
 }
