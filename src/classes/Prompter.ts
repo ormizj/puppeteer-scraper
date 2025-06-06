@@ -65,12 +65,12 @@ export default class Prompter {
     // prompt user
     const choices = [
       {
-        name: `Use default category: "${fallbackCategory}"`,
-        value: fallbackCategory,
-      },
-      {
         name: "Create new category",
         value: "new-category",
+      },
+      {
+        name: `Use default category: "${fallbackCategory}"`,
+        value: fallbackCategory,
       },
     ];
     const { categoryChoice } = await inquirer.prompt([
