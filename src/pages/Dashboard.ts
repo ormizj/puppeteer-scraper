@@ -1,8 +1,9 @@
 import type { Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
-import { sleep } from "../utils/ScraperUtil.ts";
+import { jitter, sleep } from "../utils/ScraperUtil.ts";
 import Database from "../classes/Database.ts";
 import DashboardElement from "./DashboardElement.ts";
+import { EnvConfig } from "../services/EnvConfig.ts";
 
 export default class Dashboard {
   readonly #CONTENT_CONTAINER_SELECTOR = "[data-test-id=virtuoso-scroller]";
@@ -50,6 +51,8 @@ export default class Dashboard {
 
     let processed: number;
     do {
+      const jitterAmount = EnvConfig.APP_JITTER_BETWEEN_DOWNLOADS();
+      if (jitterAmount) await jitter(0, jitterAmount);
       processed = 0;
 
       // re-select data elements
@@ -75,7 +78,7 @@ export default class Dashboard {
         if (db.getRecordByUidAndFailed(id, true)) continue;
         db.insertRecord(id);
 
-        // do action
+        // do the action
         await activator.click();
         await this.#elementor.waitForElementRemovedIfExists(
           this.#MAIN_LOADER_SELECTOR,
