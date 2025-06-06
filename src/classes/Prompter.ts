@@ -1,5 +1,4 @@
-import readline from "readline/promises";
-import { stdin as input, stdout as output } from "process";
+import inquirer from "inquirer";
 
 export default class Prompter {
   private readonly menuOptions: PromptOption[] = [
@@ -20,88 +19,33 @@ export default class Prompter {
   ];
 
   async promptConfirmation(): Promise<boolean> {
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        const rl = this.initializeReadline();
+    const { confirmed } = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "confirmed",
+        message: "Are you sure you want to perform this action?",
+        default: false,
+      },
+    ]);
 
-        console.log(`\nAre you sure you want to preform this action?`);
-        const answer = await this.getUserInput(rl, 'Type "yes" to confirm:\n');
-        rl.close();
-
-        const isConfirmed = answer.trim().toLowerCase() === "yes";
-        resolve(isConfirmed);
-      });
-    });
+    return confirmed;
   }
 
   async promptMainMenu(): Promise<PromptKey> {
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        this.printMenu();
-        const rl = this.initializeReadline();
-        const answer = await this.getAnswer(rl);
-        rl.close();
+    const choices = this.menuOptions.map((option, index) => ({
+      name: `${index + 1}. ${option.description}`,
+      value: option.key,
+    }));
 
-        // check if answer valid
-        try {
-          this.validateAnswer(answer);
-          resolve(this.menuOptions[answer].key);
-        } catch (e) {
-          const error = e as Error;
-          console.log(error.message);
-          resolve(await this.promptMainMenu());
-        }
-      });
-    });
-  }
+    const { selectedOption } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "selectedOption",
+        message: "=== Main Menu ===",
+        choices,
+      },
+    ]);
 
-  private validateAnswer(selectedIndex: number) {
-    if (
-      isNaN(selectedIndex) ||
-      selectedIndex < 0 ||
-      selectedIndex > this.menuOptions.length - 1
-    ) {
-      throw new Error("Invalid selection. Please try again");
-    }
-  }
-
-  /**
-   * @param rl
-   * @private
-   * @return {Promise} containing the index of the selected option
-   */
-  private async getAnswer(rl: readline.Interface): Promise<number> {
-    let initialAnswer = await this.getUserInput(
-      rl,
-      `Please select an option (1-${this.menuOptions.length}): `,
-    );
-    return parseInt(initialAnswer.trim()) - 1;
-  }
-
-  private printMenu() {
-    console.log("");
-    console.log("");
-    console.log("=== Main Menu ===");
-    console.log("");
-    this.menuOptions.forEach((option, index) => {
-      console.log(`${index + 1}. ${option.description}`);
-    });
-    console.log("");
-  }
-
-  private initializeReadline() {
-    return readline.createInterface({
-      input,
-      output,
-    });
-  }
-
-  private async getUserInput(
-    rl: readline.Interface,
-    question: string,
-  ): Promise<string> {
-    const answer = await rl.question(`${question}\n`);
-    console.log("");
-    return answer;
+    return selectedOption;
   }
 }
