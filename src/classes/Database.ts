@@ -19,7 +19,8 @@ export default class Database {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         uid TEXT,
         failed BOOLEAN DEFAULT TRUE,
-        failed_reason DEFAULT NULL,
+        failed_reason TEXT DEFAULT NULL,
+        download_path TEXT DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `;
@@ -87,25 +88,26 @@ export default class Database {
     }
   }
 
-  updateRecordAsSuccess(uid: string) {
-    return this.updateRecordFailed(uid, false);
+  updateRecordAsSuccess(uid: string, downloadPath: string) {
+    return this.updateRecordStatus(uid, false, null, downloadPath);
   }
   updateRecordAsFail(uid: string, reason: string) {
-    return this.updateRecordFailed(uid, true, reason);
+    return this.updateRecordStatus(uid, true, reason, null);
   }
-  private updateRecordFailed(uid: string, failed: boolean, reason?: string) {
+  private updateRecordStatus(
+    uid: string,
+    failed: boolean,
+    reason: string,
+    downloadPath: string,
+  ) {
     try {
       const updateQuery = this.#db.prepare<
-        [number, string | null, string],
+        [number, string | null, string, string | null],
         void
       >(
-        `UPDATE downloaded_data SET failed = ?, failed_reason = ? WHERE uid = ?`,
+        `UPDATE downloaded_data SET failed = ?, failed_reason = ?,download_path = ? WHERE uid = ?`,
       );
-      const result = updateQuery.run(
-        failed ? 1 : 0,
-        failed ? reason || null : null,
-        uid,
-      );
+      const result = updateQuery.run(failed ? 1 : 0, reason, downloadPath, uid);
       return result.changes > 0;
     } catch (e) {
       console.error(e);

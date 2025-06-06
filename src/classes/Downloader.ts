@@ -24,9 +24,10 @@ export default class Downloader {
     this.#data = data;
   }
 
-  recordDownloadSuccess(uid: string) {
+  recordDownloadSuccess(uid: string, imagePath: string) {
+    const relativeDownloadPath = path.relative(this.#DOWNLOAD_PATH, imagePath);
     const db = new Database();
-    db.updateRecordAsSuccess(uid);
+    db.updateRecordAsSuccess(uid, relativeDownloadPath);
     db.close();
   }
 
@@ -46,7 +47,7 @@ export default class Downloader {
       const imagePath = await this.getImagePath(data, dataHash);
       await this.generateMetaData(data, imagePath);
       await this.downloadImages(data.images, imagePath);
-      this.recordDownloadSuccess(data.id);
+      this.recordDownloadSuccess(data.id, imagePath);
     } catch (e) {
       const error = e as Error;
       console.error(error);
