@@ -3,7 +3,15 @@ import { testInvalidFileName } from "../utils/RegexUtil.ts";
 
 export default class Prompter {
   private readonly menuOptions: PromptOption[] = [
-    { key: "scrape", description: "Start web scraping process" },
+    {
+      key: "scrape-new",
+      description:
+        "Scrape new data only - stops when duplicate data is encountered",
+    },
+    {
+      key: "scrape-all",
+      description: "Scrape thoroughly - continues even if data exists",
+    },
     {
       key: "failed-records",
       description: "Display entries failed to scrape",

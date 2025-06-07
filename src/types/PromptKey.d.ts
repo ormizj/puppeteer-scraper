@@ -1,5 +1,6 @@
 type PromptKey =
-  | "scrape"
+  | "scrape-new"
+  | "scrape-all"
   | "show-duplicates"
   | "failed-records"
   | "reset-database"

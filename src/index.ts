@@ -5,6 +5,7 @@ import scrape from "./commands/scrape.ts";
 import showDuplicates from "./commands/showDuplicates.ts";
 import resetDatabase from "./commands/resetDatabase.ts";
 import showFailed from "./commands/showFailed.ts";
+import RuntimeConfig from "./services/RuntimeConfig.ts";
 
 const main = async () => {
   let pluginsCleanupFn: () => void;
@@ -15,7 +16,12 @@ const main = async () => {
     const prompter = new Prompter();
     const answer = await prompter.promptMainMenu();
     switch (answer) {
-      case "scrape":
+      case "scrape-new":
+        RuntimeConfig.setProcessMode("new");
+        await scrape();
+        break;
+      case "scrape-all":
+        RuntimeConfig.setProcessMode("all");
         await scrape();
         break;
       case "failed-records":

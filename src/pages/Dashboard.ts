@@ -4,6 +4,7 @@ import { jitter, sleep } from "../utils/ScraperUtil.ts";
 import Database from "../classes/Database.ts";
 import DashboardElement from "./DashboardElement.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
+import RuntimeConfig from "../services/RuntimeConfig.ts";
 
 export default class Dashboard {
   readonly #CONTENT_CONTAINER_SELECTOR = "[data-testid=virtuoso-scroller]";
@@ -50,11 +51,10 @@ export default class Dashboard {
     );
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
 
-    let processed: number;
-    do {
+    const processed = new Set<string>();
+    whileLoop: while (true) {
       const jitterAmount = EnvConfig.APP_JITTER_BETWEEN_DOWNLOADS();
       if (jitterAmount) await jitter(0, jitterAmount);
-      processed = 0;
 
       // re-select data elements
       let dataElements = await this.#elementor.getElements(
@@ -72,14 +72,19 @@ export default class Dashboard {
           element,
           this.#CONTENT_CONTAINER_DATA_ID_SELECTOR,
         );
-        const id = await this.#elementor.getProperty(idElement, "src");
 
-        // scroll and validate
-        await this.#elementor.scrollIntoView(activator);
-        if (db.getRecordByUidAndFailed(id, true)) continue;
-        db.insertRecord(id);
+        // check id
+        const id = await this.#elementor.getProperty(idElement, "src");
+        if (db.getRecordByUidAndFailed(id, true)) {
+          if (RuntimeConfig.getProcessMode() === "new") break whileLoop;
+          processed.add(id);
+          continue;
+        }
+        processed.clear();
 
         // do the action
+        await this.#elementor.scrollIntoView(activator);
+        db.insertRecord(id);
         await activator.click();
         await this.#elementor.waitForElementRemovedIfExists(
           this.#MAIN_LOADER_SELECTOR,
@@ -91,13 +96,9 @@ export default class Dashboard {
         // download element
         const dashboardElement = new DashboardElement(this.#page, id);
         await dashboardElement.download();
-
-        // add to count
-        processed++;
       }
+    }
 
-      // if any new elements where processed, check for new elements
-    } while (processed);
     db.close();
   }
 }
