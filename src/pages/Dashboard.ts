@@ -83,6 +83,7 @@ export default class Dashboard {
         // check id
         const id = await this.#elementor.getProperty(idElement, "src");
         const record = db.getRecordByUid(id);
+        await this.#elementor.scrollIntoView(activator);
 
         // if duplicate
         if (record && !record.failed) {
@@ -113,7 +114,6 @@ export default class Dashboard {
         consecutiveDuplicate = 0;
 
         // do the action
-        await this.#elementor.scrollIntoView(activator);
         db.insertRecord(id);
         await activator.click();
         await this.#elementor.waitForElementRemovedIfExists(
