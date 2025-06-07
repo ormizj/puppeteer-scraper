@@ -91,7 +91,7 @@ export default class Dashboard {
           if (RuntimeConfig.getProcessMode() === "all") {
             consecutiveDuplicate++;
             console.log(
-              `DUPLICATE ID (CONSECUTIVE: #${consecutiveDuplicate}): ${id}`,
+              `DUPLICATE ID (CONSECUTIVE: #${consecutiveDuplicate}): ${record.id} | ${id}`,
             );
 
             // check if to break the loop
