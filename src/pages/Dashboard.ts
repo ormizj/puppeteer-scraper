@@ -51,7 +51,6 @@ export default class Dashboard {
     );
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
 
-    const processed = new Set<string>();
     whileLoop: while (true) {
       const jitterAmount = EnvConfig.APP_JITTER_BETWEEN_DOWNLOADS();
       if (jitterAmount) await jitter(0, jitterAmount);
@@ -75,12 +74,12 @@ export default class Dashboard {
 
         // check id
         const id = await this.#elementor.getProperty(idElement, "src");
-        if (db.getRecordByUidAndFailed(id, true)) {
+        const record = db.getRecordByUid(id);
+        if (record && !record.failed) {
           if (RuntimeConfig.getProcessMode() === "new") break whileLoop;
-          processed.add(id);
+          console.log(`DUPLICATE ID: ${id}`);
           continue;
         }
-        processed.clear();
 
         // do the action
         await this.#elementor.scrollIntoView(activator);
