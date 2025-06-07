@@ -6,7 +6,7 @@ import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
-import { sanitizeFileName } from "../utils/RegexUtil.ts";
+import { sanitizeFolderName } from "../utils/RegexUtil.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -108,7 +108,7 @@ export default class Downloader {
         if (fs.existsSync(categoryPath)) {
           return await this.searchForDataHash(
             categoryPath,
-            sanitizeFileName(loraName),
+            sanitizeFolderName(loraName),
             dataHash,
           );
         }
@@ -116,13 +116,16 @@ export default class Downloader {
 
       // if no mapping found, create one
       const prompter = new Prompter();
-      const { dataKey, folderName } =
-        await prompter.promptFolderMapping(loraNames);
-      db.insertDownloadMapping(dataKey, folderName);
+      const { categoryName, folderName } = await prompter.promptFolderMapping(
+        loraNames,
+        this.#DOWNLOAD_PATH,
+      );
+      db.insertDownloadMapping(categoryName, folderName);
+
       return path.join(
         this.#DOWNLOAD_PATH,
         folderName,
-        sanitizeFileName(dataKey),
+        sanitizeFolderName(categoryName),
         dataHash,
       );
     } finally {

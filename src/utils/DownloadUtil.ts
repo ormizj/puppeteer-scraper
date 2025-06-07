@@ -49,3 +49,11 @@ export const removeEmptyDirectory = (directoryPath: string): boolean => {
   fs.rmdirSync(directoryPath);
   return true;
 };
+
+export const getExistingFolders = (path: string): string[] => {
+  return fs
+    .readdirSync(path, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+    .sort();
+};
