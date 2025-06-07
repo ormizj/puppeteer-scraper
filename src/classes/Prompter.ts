@@ -31,16 +31,28 @@ export default class Prompter {
   ];
 
   async promptNumber({ message, min, max }): Promise<number> {
-    const { number } = await inquirer.prompt([
+    const { threshold } = await inquirer.prompt([
       {
-        type: "number",
-        name: "number",
-        min,
-        max,
+        type: "input",
+        name: "threshold",
         message,
+        validate: (input: string) => {
+          const num = parseInt(input.trim());
+          if (isNaN(num)) {
+            return "Please enter a valid number";
+          }
+          if (num < min) {
+            return `Minimum is: ${min}`;
+          }
+          if (num > max) {
+            return `Maximum is: ${max}`;
+          }
+          return true;
+        },
       },
     ]);
-    return number;
+
+    return parseInt(threshold.trim());
   }
 
   async promptConfirmation({

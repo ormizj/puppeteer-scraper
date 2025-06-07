@@ -5,6 +5,7 @@ import Database from "../classes/Database.ts";
 import DashboardElement from "./DashboardElement.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
 import RuntimeConfig from "../services/RuntimeConfig.ts";
+import Prompter from "../classes/Prompter.ts";
 
 export default class Dashboard {
   readonly #CONTENT_CONTAINER_SELECTOR = "[data-testid=virtuoso-scroller]";
@@ -35,10 +36,13 @@ export default class Dashboard {
 
   readonly #page: Page;
   readonly #elementor: Elementor;
+  readonly #prompter: Prompter;
+  readonly #MAX_CONSECUTIVE_DUPLICATE_THRESHOLD = 1000;
 
   constructor(page: Page) {
     this.#page = page;
     this.#elementor = new Elementor(page);
+    this.#prompter = new Prompter();
   }
 
   async downloadAll() {
@@ -52,8 +56,9 @@ export default class Dashboard {
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
 
     let consecutiveDuplicate = 0;
+    let consecutiveDuplicateThreshold = 1;
     let processed: number;
-    do {
+    outer: do {
       processed = 0;
       const jitterAmount = EnvConfig.APP_JITTER_BETWEEN_DOWNLOADS();
       if (jitterAmount) await jitter(0, jitterAmount);
@@ -78,11 +83,28 @@ export default class Dashboard {
         // check id
         const id = await this.#elementor.getProperty(idElement, "src");
         const record = db.getRecordByUid(id);
+
+        // if duplicate
         if (record && !record.failed) {
-          consecutiveDuplicate++;
-          console.log(
-            `DUPLICATE ID (CONSECUTIVE: #${consecutiveDuplicate}): ${id}`,
-          );
+          // check consecutive if in "all" mode
+          if (RuntimeConfig.getProcessMode() === "all") {
+            consecutiveDuplicate++;
+            console.log(
+              `DUPLICATE ID (CONSECUTIVE: #${consecutiveDuplicate}): ${id}`,
+            );
+
+            // check if to break the loop
+            if (consecutiveDuplicate >= consecutiveDuplicateThreshold) {
+              consecutiveDuplicateThreshold =
+                await this.consecutiveDuplicatePrompt(consecutiveDuplicate);
+              if (!consecutiveDuplicateThreshold) break outer;
+              console.log(
+                `Consecutive duplicate has been reset and the threshold set to: ${consecutiveDuplicateThreshold}`,
+              );
+              consecutiveDuplicate = 0;
+            }
+          }
+
           continue;
         }
 
@@ -108,5 +130,21 @@ export default class Dashboard {
     } while (processed || RuntimeConfig.getProcessMode() !== "new");
 
     db.close();
+  }
+
+  async consecutiveDuplicatePrompt(
+    consecutiveDuplicate: number,
+  ): Promise<number | undefined> {
+    const shouldContinue = await this.#prompter.promptConfirmation({
+      message: `There have been ${consecutiveDuplicate} consecutive duplicates. Do you want to continue the scraping?`,
+      defaultAnswer: true,
+    });
+    if (!shouldContinue) return;
+
+    return await this.#prompter.promptNumber({
+      message: `"Enter new consecutive duplicate threshold (max: ${this.#MAX_CONSECUTIVE_DUPLICATE_THRESHOLD}):`,
+      min: 1,
+      max: this.#MAX_CONSECUTIVE_DUPLICATE_THRESHOLD,
+    });
   }
 }
