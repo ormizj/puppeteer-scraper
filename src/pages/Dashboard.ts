@@ -56,7 +56,7 @@ export default class Dashboard {
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
 
     let consecutiveDuplicate = 0;
-    let consecutiveDuplicateThreshold = 1;
+    let consecutiveDuplicateThreshold = 2;
     let processed: number;
     outer: do {
       processed = 0;
