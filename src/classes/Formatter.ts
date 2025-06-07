@@ -7,7 +7,6 @@ export default class Formatter {
 
   json(): string {
     const metadata = {
-      id: this.#data.id,
       prompt: this.#data.prompt,
       negative: this.#data.negative,
       model: this.#data.model,
@@ -39,10 +38,6 @@ export default class Formatter {
     lines.push(decorator);
     lines.push("METADATA INFORMATION");
     lines.push(decorator);
-    lines.push("");
-
-    // basic
-    lines.push(`ID: ${this.#data.id}`);
     lines.push(spacer);
 
     // prompt
