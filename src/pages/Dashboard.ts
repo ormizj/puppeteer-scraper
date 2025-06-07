@@ -81,7 +81,12 @@ export default class Dashboard {
         );
 
         // check id
-        const id = await this.#elementor.getProperty(idElement, "src");
+        let id: string;
+        try {
+          id = await this.#elementor.getProperty(idElement, "src");
+        } catch {
+          continue;
+        }
         const record = db.getRecordByUid(id);
         await this.#elementor.scrollIntoView(activator);
 
