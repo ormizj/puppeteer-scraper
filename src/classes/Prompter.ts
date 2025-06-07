@@ -30,6 +30,19 @@ export default class Prompter {
     { key: "exit", description: "Exit the application" },
   ];
 
+  async promptNumber({ message, min, max }): Promise<number> {
+    const { number } = await inquirer.prompt([
+      {
+        type: "number",
+        name: "number",
+        min,
+        max,
+        message,
+      },
+    ]);
+    return number;
+  }
+
   async promptConfirmation({
     message = "Are you sure you want to perform this action?",
     defaultAnswer = false,
