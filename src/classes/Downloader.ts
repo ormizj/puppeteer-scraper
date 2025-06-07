@@ -6,6 +6,7 @@ import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
 import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
+import { sanitizeFileName } from "../utils/RegexUtil.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -40,7 +41,7 @@ export default class Downloader {
       const dataHash = this.getDataHash(data);
       const imagePath = await this.getImagePath(data, dataHash);
       await this.generateMetaData(data, imagePath);
-      // await this.downloadImages(data.images, imagePath);
+      await this.downloadImages(data.images, imagePath);
       this.recordDownloadSuccess(data.id, imagePath);
     } catch (e) {
       const error = e as Error;
@@ -105,7 +106,11 @@ export default class Downloader {
         // check if the folder exists return the path
         const categoryPath = path.join(this.#DOWNLOAD_PATH, folderName);
         if (fs.existsSync(categoryPath)) {
-          return await this.searchForDataHash(categoryPath, dataHash);
+          return await this.searchForDataHash(
+            categoryPath,
+            sanitizeFileName(loraName),
+            dataHash,
+          );
         }
       }
 
@@ -114,7 +119,12 @@ export default class Downloader {
       const { dataKey, folderName } =
         await prompter.promptFolderMapping(loraNames);
       db.insertDownloadMapping(dataKey, folderName);
-      return path.join(this.#DOWNLOAD_PATH, folderName, dataHash);
+      return path.join(
+        this.#DOWNLOAD_PATH,
+        folderName,
+        sanitizeFileName(dataKey),
+        dataHash,
+      );
     } finally {
       db.close();
     }
@@ -122,6 +132,7 @@ export default class Downloader {
 
   private async searchForDataHash(
     categoryPath: string,
+    loraName: string,
     dataHash: string,
   ): Promise<string | null> {
     const folderHashes = fs.readdirSync(categoryPath, { withFileTypes: true });
@@ -133,7 +144,7 @@ export default class Downloader {
     }
 
     // if dataHash not found, return a new path in this folder
-    return path.join(categoryPath, dataHash);
+    return path.join(categoryPath, loraName, dataHash);
   }
 
   private async downloadImages(images: string[], downloadPath: string) {
