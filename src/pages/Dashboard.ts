@@ -51,6 +51,7 @@ export default class Dashboard {
     );
     await this.#elementor.elementClick(this.#INFORMATION_EXPAND_BUTTON);
 
+    let consecutiveDuplicate = 0;
     whileLoop: while (true) {
       const jitterAmount = EnvConfig.APP_JITTER_BETWEEN_DOWNLOADS();
       if (jitterAmount) await jitter(0, jitterAmount);
@@ -77,9 +78,13 @@ export default class Dashboard {
         const record = db.getRecordByUid(id);
         if (record && !record.failed) {
           if (RuntimeConfig.getProcessMode() === "new") break whileLoop;
-          console.log(`DUPLICATE ID: ${id}`);
+          consecutiveDuplicate++;
+          console.log(
+            `DUPLICATE ID (CONSECUTIVE: #${consecutiveDuplicate}): ${id}`,
+          );
           continue;
         }
+        consecutiveDuplicate = 0;
 
         // do the action
         await this.#elementor.scrollIntoView(activator);
