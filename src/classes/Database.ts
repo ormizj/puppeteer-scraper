@@ -18,10 +18,11 @@ export default class Database {
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS downloaded_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        uid TEXT,
+        uid TEXT UNIQUE NOT NULL,
         failed BOOLEAN DEFAULT TRUE,
         failed_reason TEXT DEFAULT NULL,
         download_path TEXT DEFAULT NULL,
+        metadata TEXT DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `;
@@ -78,7 +79,7 @@ export default class Database {
   insertRecord(uid: string) {
     try {
       const insertQuery = this.#db.prepare<string, DownloadedData>(`
-        INSERT INTO downloaded_data (uid) VALUES (?)
+        INSERT OR IGNORE INTO downloaded_data (uid) VALUES (?)
       `);
 
       return insertQuery.run(uid);
@@ -118,7 +119,7 @@ export default class Database {
 
   getAllFailedRecords() {
     try {
-      const selectFailedQuery = this.#db.prepare<[], DownloadedData[]>(`
+      const selectFailedQuery = this.#db.prepare<[], DownloadedData>(`
         SELECT * FROM downloaded_data WHERE failed = TRUE ORDER BY created_at DESC
       `);
 
@@ -149,6 +150,19 @@ export default class Database {
         `UPDATE downloaded_data SET failed = ?, failed_reason = ?,download_path = ? WHERE uid = ?`,
       );
       const result = updateQuery.run(failed ? 1 : 0, reason, downloadPath, uid);
+      return result.changes > 0;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  updateRecordMetadata(uid: string, metadata: object) {
+    try {
+      const updateQuery = this.#db.prepare<[string, string], void>(
+        `UPDATE downloaded_data SET metadata = ? WHERE uid = ?`,
+      );
+      const result = updateQuery.run(JSON.stringify(metadata), uid);
       return result.changes > 0;
     } catch (e) {
       console.error(e);

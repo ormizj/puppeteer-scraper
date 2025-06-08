@@ -4,5 +4,6 @@ interface DownloadedData {
   failed: boolean;
   failed_reason: string;
   download_path: string;
+  metadata: string;
   created_at: string;
 }

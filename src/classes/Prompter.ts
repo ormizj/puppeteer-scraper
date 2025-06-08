@@ -19,10 +19,6 @@ export default class Prompter {
       description: "Display entries failed to scrape",
     },
     {
-      key: "show-duplicates",
-      description: "Display duplicate scraped data entries",
-    },
-    {
       key: "reset-database",
       description:
         "Reset all scrapped data and mapping entries from the Database",

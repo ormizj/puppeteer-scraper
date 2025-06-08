@@ -2,7 +2,6 @@ import "dotenv/config";
 import plugins from "./plugins/Index.ts";
 import Prompter from "./classes/Prompter.ts";
 import scrape from "./commands/scrape.ts";
-import showDuplicates from "./commands/showDuplicates.ts";
 import resetDatabase from "./commands/resetDatabase.ts";
 import showFailed from "./commands/showFailed.ts";
 import RuntimeConfig from "./services/RuntimeConfig.ts";
@@ -26,9 +25,6 @@ const main = async () => {
         break;
       case "failed-records":
         await showFailed();
-        break;
-      case "show-duplicates":
-        await showDuplicates();
         break;
       case "reset-database":
         await resetDatabase();
