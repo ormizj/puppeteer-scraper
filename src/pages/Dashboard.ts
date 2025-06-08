@@ -85,6 +85,7 @@ export default class Dashboard {
         try {
           id = await this.#elementor.getProperty(idElement, "src");
         } catch {
+          console.error("Failed to get ID from element");
           continue;
         }
         const record = db.getRecordByUid(id);
