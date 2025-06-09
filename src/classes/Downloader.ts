@@ -43,7 +43,7 @@ export default class Downloader {
       const dataHash = this.getDataHash(data);
       const imagePath = await this.getImagePath(data, dataHash);
       await this.generateMetaData(data, imagePath);
-      await this.downloadImages(data.images, imagePath);
+      // await this.downloadImages(data.images, imagePath);
       this.recordDownloadSuccess(data.id, imagePath, data);
     } catch (e) {
       const error = e as Error;
@@ -116,14 +116,25 @@ export default class Downloader {
         }
       }
 
-      // if no mapping found, create one
+      // if no mapping found, prompt the user for choice
       const prompter = new Prompter();
-      const { categoryName, folderName } = await prompter.promptFolderMapping(
+      const categoryAndFolder = await prompter.promptFolderMapping(
         loraNames,
         this.#DOWNLOAD_PATH,
       );
-      db.insertDownloadMapping(categoryName, folderName);
 
+      // if user chose default download path
+      if (!categoryAndFolder) {
+        return path.join(
+          this.#DOWNLOAD_PATH,
+          EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME(),
+          dataHash,
+        );
+      }
+
+      // save mapping and return path
+      const { categoryName, folderName } = categoryAndFolder;
+      db.insertDownloadMapping(categoryName, folderName);
       return path.join(
         this.#DOWNLOAD_PATH,
         folderName,

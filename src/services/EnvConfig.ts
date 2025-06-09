@@ -25,9 +25,14 @@ export class EnvConfig {
     throw new Error(`Environment variable '${key}' must be 'true' or 'false'`);
   }
 
+  static APP_UNCATEGORIZED_FOLDER_NAME(): string {
+    return this.getString("APP_UNCATEGORIZED_FOLDER_NAME");
+  }
+
   static APP_JITTER_BETWEEN_DOWNLOADS(): number {
     return this.getNumber("APP_JITTER_BETWEEN_DOWNLOADS");
   }
+
   static APP_LOG_DATA_TO_DOWNLOAD(): boolean {
     return this.getBoolean("APP_LOG_DATA_TO_DOWNLOAD");
   }

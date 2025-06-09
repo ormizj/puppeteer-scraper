@@ -2,6 +2,7 @@ import inquirer from "inquirer";
 import { getExistingFolders } from "../utils/DownloadUtil.ts";
 import { testInvalidFolderName } from "../utils/RegexUtil.ts";
 import chalk from "chalk";
+import { EnvConfig } from "../services/EnvConfig.ts";
 
 export default class Prompter {
   private readonly menuOptions: PromptOption[] = [
@@ -87,9 +88,12 @@ export default class Prompter {
   async promptFolderMapping(
     categoryNames: string[],
     directory: string,
-  ): Promise<{ categoryName: string; folderName: string }> {
+  ): Promise<{ categoryName: string | null; folderName: string | null }> {
     // category
     const selectedCategory = await this.promptCategory(categoryNames);
+
+    // if no category selected, return
+    if (selectedCategory === null) return null;
 
     // folder
     console.log(`Select a folder for the category: ${selectedCategory}`);
@@ -113,7 +117,7 @@ export default class Prompter {
     return { categoryName: selectedCategory, folderName };
   }
 
-  private async promptCategory(categories: string[]): Promise<string> {
+  private async promptCategory(categories: string[]): Promise<string | null> {
     // print title
     console.log("");
     console.log(this.generateTitle("Available Categories"));
@@ -122,11 +126,23 @@ export default class Prompter {
     });
     console.log("");
 
-    // get category
-    const categoryChoices = categories.map((name, index) => ({
-      name: `${index + 1}. ${name}`,
-      value: name,
-    }));
+    // get categories
+    const categoryChoices = [
+      // select category
+      new inquirer.Separator(this.generateSubTitle("Available Categories")),
+      ...categories.map((name, index) => ({
+        name: `${index + 1}. ${name}`,
+        value: name,
+      })),
+      // skip category mapping
+      new inquirer.Separator(this.generateSubTitle("Skip Category Mapping")),
+      {
+        name: `${EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME()} (no category mapping)`,
+        value: null,
+      },
+    ];
+
+    // l
     const { selectedCategory } = await inquirer.prompt([
       {
         type: "list",
@@ -135,17 +151,34 @@ export default class Prompter {
         choices: categoryChoices,
       },
     ]);
+
+    if (selectedCategory === null) {
+      const confirmed = await this.promptConfirmation({
+        message: `Confirm using folder "${this.markYellow(EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME())}", without category mapping?`,
+      });
+
+      if (!confirmed) {
+        return await this.promptCategory(categories);
+      }
+    }
+
     return selectedCategory;
   }
 
   private async promptFolderList(folderList: string[]): Promise<null | string> {
+    // filter default download location
+    const filteredFolders = folderList.filter(
+      (folder) => folder !== EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME(),
+    );
+
     const choices = [
+      new inquirer.Separator(this.generateSubTitle("New Folder")),
       {
         name: "Create a new folder",
         value: null,
       },
-      new inquirer.Separator(this.generateSubTitle("Existing Categories")),
-      ...folderList.map((folder) => ({
+      new inquirer.Separator(this.generateSubTitle("Existing Folders")),
+      ...filteredFolders.map((folder) => ({
         name: folder,
         value: folder,
       })),
