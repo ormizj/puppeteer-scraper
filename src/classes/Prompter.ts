@@ -222,6 +222,25 @@ export default class Prompter {
     return newFolderName.trim();
   }
 
+  async promptForceDownload(data: Partial<ElementData>): Promise<boolean> {
+    // print object
+    console.log("");
+    console.log(this.generateTitle("Current Data"));
+    console.dir(data, { depth: null, colors: true });
+    console.log("");
+
+    // first confirmation
+    const firstConfirmed = await this.promptConfirmation({
+      message: `The element has missing data. Do you still want to save it?`,
+    });
+    if (!firstConfirmed) return false;
+
+    // second confirmation
+    return await this.promptConfirmation({
+      message: `${this.markRed("Final confirmation:")} are you sure you want to save incomplete data into "${this.markYellow(EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME())}" folder?`,
+    });
+  }
+
   private generateTitle(title: string): string {
     return `===== ${title} =====`;
   }

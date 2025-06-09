@@ -41,13 +41,34 @@ export default class Downloader {
     try {
       if (!this.validateData(data)) return;
       const dataHash = this.getDataHash(data);
-      const imagePath = await this.getImagePath(data, dataHash);
+      const imagePath = await this.getDownloadPath(data, dataHash);
       await this.generateMetaData(data, imagePath);
-      // await this.downloadImages(data.images, imagePath);
+      await this.downloadImages(data.images, imagePath);
       this.recordDownloadSuccess(data.id, imagePath, data);
     } catch (e) {
       const error = e as Error;
       console.error(error);
+      await this.handleDownloadError(error, data);
+    }
+  }
+
+  private async handleDownloadError(error: Error, data: Partial<ElementData>) {
+    const riskyData = data as ElementData;
+    const prompter = new Prompter();
+    const shouldForceDownload = await prompter.promptForceDownload(this.#data);
+
+    if (shouldForceDownload) {
+      // safe to default download path with missing data
+      const imagePath = path.join(
+        this.#DOWNLOAD_PATH,
+        EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME(),
+        this.getDataHash(riskyData),
+      );
+      await this.generateMetaData(riskyData, imagePath);
+      await this.downloadImages(data.images, imagePath);
+      // skip "searchForDataHash", since there might be no loras
+      this.recordDownloadSuccess(this.#data.id, imagePath, data);
+    } else {
       this.recordDownloadFailure(this.#data.id, error.message, data);
     }
   }
@@ -90,7 +111,7 @@ export default class Downloader {
     return createSha256Base64UrlHash(hashInput);
   }
 
-  private async getImagePath(
+  private async getDownloadPath(
     data: ElementData,
     dataHash: string,
   ): Promise<string> {
