@@ -7,6 +7,7 @@ import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
 import { sanitizeFolderName } from "../utils/RegexUtil.ts";
+import RuntimeConfig from "../services/RuntimeConfig.ts";
 
 export default class Downloader {
   readonly #DOWNLOAD_PATH = EnvConfig.APP_DOWNLOAD_PATH();
@@ -55,7 +56,9 @@ export default class Downloader {
   private async handleDownloadError(error: Error, data: Partial<ElementData>) {
     const riskyData = data as ElementData;
     const prompter = new Prompter();
-    const shouldForceDownload = await prompter.promptForceDownload(this.#data);
+    const shouldForceDownload =
+      RuntimeConfig.getConfirmationMode() === "skip-warnings" ||
+      (await prompter.promptForceDownload(this.#data));
 
     if (shouldForceDownload) {
       // safe to default download path with missing data

@@ -16,6 +16,11 @@ export default class Prompter {
       description: "Scrape thoroughly - continues even if data exists",
     },
     {
+      key: "scrape-all-skip",
+      description:
+        "Scrape thoroughly - continues even if data exists (downloads with missing data, without confirmation)",
+    },
+    {
       key: "failed-records",
       description: "Display entries failed to scrape",
     },

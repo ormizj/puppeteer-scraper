@@ -17,10 +17,17 @@ const main = async () => {
     switch (answer) {
       case "scrape-new":
         RuntimeConfig.setProcessMode("new");
+        RuntimeConfig.setConfirmationMode("normal");
         await scrape();
         break;
       case "scrape-all":
         RuntimeConfig.setProcessMode("all");
+        RuntimeConfig.setConfirmationMode("normal");
+        await scrape();
+        break;
+      case "scrape-all-skip":
+        RuntimeConfig.setProcessMode("all");
+        RuntimeConfig.setConfirmationMode("skip-warnings");
         await scrape();
         break;
       case "failed-records":
