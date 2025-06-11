@@ -37,7 +37,7 @@ export default class Dashboard {
   readonly #page: Page;
   readonly #elementor: Elementor;
   readonly #prompter: Prompter;
-  readonly #MAX_CONSECUTIVE_DUPLICATE_THRESHOLD = 1000;
+  readonly #MAX_CONSECUTIVE_DUPLICATE_THRESHOLD = 10000;
 
   constructor(page: Page) {
     this.#page = page;
