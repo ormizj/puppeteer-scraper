@@ -109,17 +109,26 @@ export default class DashboardElement {
   }
 
   private async getModel() {
-    const modelName = await this.#elementor.getText(this.#MODEL_SELECTOR);
-    const modelLink = await this.#elementor.getProperty(
-      this.#MODEL_SELECTOR,
-      "href",
-    );
-    return {
-      model: {
-        name: modelName,
-        link: modelLink,
-      },
-    };
+    try {
+      const modelName = await this.#elementor.getText(this.#MODEL_SELECTOR);
+      const modelLink = await this.#elementor.getProperty(
+        this.#MODEL_SELECTOR,
+        "href",
+      );
+      return {
+        model: {
+          name: modelName,
+          link: modelLink,
+        },
+      };
+    } catch {
+      return {
+        model: {
+          name: "",
+          link: "",
+        },
+      };
+    }
   }
 
   private async getLoras() {
@@ -183,21 +192,30 @@ export default class DashboardElement {
   }
 
   private async getSize() {
-    const sizeElement = await this.#elementor.getElement(this.#SIZE_SELECTOR);
-    const ratio = await this.#elementor.getText(
-      sizeElement,
-      this.#SIZE_RATIO_SELECTOR,
-    );
-    const resolution = await this.#elementor.getText(
-      sizeElement,
-      this.#SIZE_RESOLUTION_SELECTOR,
-    );
-    return {
-      size: {
-        ratio,
-        resolution,
-      },
-    };
+    try {
+      const sizeElement = await this.#elementor.getElement(this.#SIZE_SELECTOR);
+      const ratio = await this.#elementor.getText(
+        sizeElement,
+        this.#SIZE_RATIO_SELECTOR,
+      );
+      const resolution = await this.#elementor.getText(
+        sizeElement,
+        this.#SIZE_RESOLUTION_SELECTOR,
+      );
+      return {
+        size: {
+          ratio,
+          resolution,
+        },
+      };
+    } catch {
+      return {
+        size: {
+          ratio: "",
+          resolution: "",
+        },
+      };
+    }
   }
 
   private async getNegative() {
