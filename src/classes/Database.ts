@@ -248,6 +248,19 @@ export default class Database {
     }
   }
 
+  countDownloadedDataRecords(): number {
+    try {
+      const countQuery = this.#db.prepare<[], { count: number }>(`
+      SELECT COUNT(*) as count FROM downloaded_data
+    `);
+      const result = countQuery.get();
+      return result ? result.count : 0;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
   close() {
     this.#db.close();
   }

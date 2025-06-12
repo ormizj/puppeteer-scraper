@@ -1,8 +1,7 @@
-import { databasePlugin } from "./Database.ts";
+import { databasePlugin } from "./databasePlugin.ts";
+import { runtimeConfigPlugin } from "./runtimeConfigPlugin.ts";
 
 export default () => {
-  // creates the database and closes the connection
-  databasePlugin()();
-  // cleanup function
-  return () => {};
+  databasePlugin();
+  runtimeConfigPlugin();
 };

@@ -37,12 +37,16 @@ export default class Dashboard {
   readonly #page: Page;
   readonly #elementor: Elementor;
   readonly #prompter: Prompter;
-  readonly #MAX_CONSECUTIVE_DUPLICATE_THRESHOLD = 1000;
+  readonly #MAX_CONSECUTIVE_DUPLICATE_THRESHOLD: number;
 
   constructor(page: Page) {
     this.#page = page;
     this.#elementor = new Elementor(page);
     this.#prompter = new Prompter();
+    this.#MAX_CONSECUTIVE_DUPLICATE_THRESHOLD = Math.max(
+      1000,
+      RuntimeConfig.getDownloadedDataRecordsCount(),
+    );
   }
 
   async downloadAll() {

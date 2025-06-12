@@ -7,9 +7,8 @@ import showFailed from "./commands/showFailed.ts";
 import RuntimeConfig from "./services/RuntimeConfig.ts";
 
 const main = async () => {
-  let pluginsCleanupFn: () => void;
   try {
-    pluginsCleanupFn = plugins();
+    plugins();
 
     // run the script
     const prompter = new Prompter();
@@ -45,8 +44,6 @@ const main = async () => {
   } catch (e) {
     console.error(e);
     process.exit(1);
-  } finally {
-    pluginsCleanupFn();
   }
 };
 

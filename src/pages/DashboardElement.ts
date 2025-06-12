@@ -262,6 +262,9 @@ export default class DashboardElement {
 
   private async getVaeModel() {
     const vaeContainer = await this.getMetaDataContainer(this.#VAE_INDEX);
+    // if vae is not defined, it isn't supported in the element
+    if (vaeContainer === undefined) return { vae: "" };
+
     const vae = await this.#elementor.getProperty(
       vaeContainer,
       this.#VAE_STEPS_SELECTOR,
