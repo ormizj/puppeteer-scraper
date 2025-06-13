@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
-import { getExistingFolders } from "../utils/DownloadUtil.ts";
-import { testInvalidFolderName } from "../utils/RegexUtil.ts";
+import { getExistingFolders } from "../utils/downloadUtil.ts";
+import { testInvalidFolderName } from "../utils/regexUtil.ts";
 import chalk from "chalk";
 import { EnvConfig } from "../services/EnvConfig.ts";
 
@@ -19,6 +19,10 @@ export default class Prompter {
       key: "scrape-all-skip",
       description:
         "Scrape thoroughly - continues even if data exists (downloads with missing data, without confirmation)",
+    },
+    {
+      key: "update-folder-name",
+      description: "Update an existing folder's name",
     },
     {
       key: "failed-records",
@@ -170,37 +174,45 @@ export default class Prompter {
     return selectedCategory;
   }
 
-  private async promptFolderList(folderList: string[]): Promise<null | string> {
+  async promptFolderList(
+    folderList: string[],
+    newFolderOption = true,
+  ): Promise<null | string> {
     // filter default download location
     const filteredFolders = folderList.filter(
       (folder) => folder !== EnvConfig.APP_UNCATEGORIZED_FOLDER_NAME(),
     );
 
-    const choices = [
-      new inquirer.Separator(this.generateSubTitle("New Folder")),
-      {
-        name: "Create a new folder",
-        value: null,
-      },
-      new inquirer.Separator(this.generateSubTitle("Existing Folders")),
+    const choices = [];
+    if (newFolderOption) {
+      choices.push(
+        new inquirer.Separator(this.generateSubTitle("New Folder")),
+        {
+          name: "Create a new folder",
+          value: null,
+        },
+        new inquirer.Separator(this.generateSubTitle("Existing Folders")),
+      );
+    }
+    choices.push(
       ...filteredFolders.map((folder) => ({
         name: folder,
         value: folder,
       })),
-    ];
+    );
 
     const { selectedOption } = await inquirer.prompt([
       {
         type: "list",
         name: "selectedOption",
-        message: "Choose a category:",
+        message: "Choose a folder:",
         choices,
       },
     ]);
     return selectedOption;
   }
 
-  private async promptFolderName(
+  async promptFolderName(
     existingFolders: string[],
     message: string,
   ): Promise<string> {
@@ -246,22 +258,22 @@ export default class Prompter {
     });
   }
 
-  private generateTitle(title: string): string {
+  generateTitle(title: string): string {
     return `===== ${title} =====`;
   }
-  private generateSubTitle(subTitle: string): string {
+  generateSubTitle(subTitle: string): string {
     return `----- ${subTitle} -----`;
   }
 
-  private markRed(text: string): string {
+  markRed(text: string): string {
     return chalk.redBright(text);
   }
 
-  private markGreen(text: string): string {
+  markGreen(text: string): string {
     return chalk.greenBright(text);
   }
 
-  private markYellow(text: string): string {
+  markYellow(text: string): string {
     return chalk.yellowBright(text);
   }
 }

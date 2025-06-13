@@ -1,4 +1,4 @@
-import { random } from "./NumberUtil.ts";
+import { random } from "./numberUtil.ts";
 
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));

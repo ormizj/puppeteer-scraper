@@ -5,6 +5,7 @@ import scrape from "./commands/scrape.ts";
 import resetDatabase from "./commands/resetDatabase.ts";
 import showFailed from "./commands/showFailed.ts";
 import RuntimeConfig from "./services/RuntimeConfig.ts";
+import updateFolderName from "./commands/updateFolderName.ts";
 
 const main = async () => {
   try {
@@ -28,6 +29,9 @@ const main = async () => {
         RuntimeConfig.setProcessMode("all");
         RuntimeConfig.setConfirmationMode("skip-warnings");
         await scrape();
+        break;
+      case "update-folder-name":
+        await updateFolderName();
         break;
       case "failed-records":
         await showFailed();

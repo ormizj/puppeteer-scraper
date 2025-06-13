@@ -1,6 +1,6 @@
 import Database from "../classes/Database.ts";
 import Prompter from "../classes/Prompter.ts";
-import { printSuccessMessage } from "../utils/MessageUtil.ts";
+import { printSuccessMessage } from "../utils/messageUtil.ts";
 
 export default async () => {
   const prompter = new Prompter();

@@ -2,11 +2,11 @@ import fs from "fs";
 import path from "path";
 import Database from "./Database.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
-import { downloadFromUrl, generateDirectory } from "../utils/DownloadUtil.ts";
-import { createSha256Base64UrlHash } from "../utils/HashUtil.ts";
+import { downloadFromUrl, generateDirectory } from "../utils/downloadUtil.ts";
+import { createSha256Base64UrlHash } from "../utils/hashUtil.ts";
 import Formatter from "./Formatter.ts";
 import Prompter from "./Prompter.ts";
-import { sanitizeFolderName } from "../utils/RegexUtil.ts";
+import { sanitizeFolderName } from "../utils/regexUtil.ts";
 import RuntimeConfig from "../services/RuntimeConfig.ts";
 
 export default class Downloader {
