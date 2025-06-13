@@ -150,7 +150,7 @@ export default class Database {
         `UPDATE downloaded_data SET failed = ?, failed_reason = ?,download_path = ? WHERE uid = ?`,
       );
       const result = updateQuery.run(failed ? 1 : 0, reason, downloadPath, uid);
-      return result.changes > 0;
+      return result.changes;
     } catch (e) {
       console.error(e);
       throw e;
@@ -163,7 +163,7 @@ export default class Database {
         `UPDATE downloaded_data SET metadata = ? WHERE uid = ?`,
       );
       const result = updateQuery.run(JSON.stringify(metadata), uid);
-      return result.changes > 0;
+      return result.changes;
     } catch (e) {
       console.error(e);
       throw e;
@@ -255,6 +255,19 @@ export default class Database {
     `);
       const result = countQuery.get();
       return result ? result.count : 0;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  updateFolderName(folderName: string, newFolderName: string) {
+    try {
+      const updateQuery = this.#db.prepare<[string, string], void>(
+        `UPDATE download_map SET folder_name = ? WHERE folder_name = ?`,
+      );
+      const result = updateQuery.run(newFolderName, folderName);
+      return result.changes;
     } catch (e) {
       console.error(e);
       throw e;

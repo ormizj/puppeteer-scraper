@@ -1,6 +1,9 @@
 import Prompter from "../classes/Prompter.ts";
 import { getExistingFolders } from "../utils/downloadUtil.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
+import Database from "../classes/Database.ts";
+import { join } from "path";
+import fs from "fs";
 
 export default async () => {
   const prompter = new Prompter();
@@ -17,5 +20,27 @@ export default async () => {
   });
   if (!confirmed) return;
 
-  console.log(originalFolderName, newFolderName);
+  let db: Database | undefined;
+  try {
+    db = new Database();
+    // initialize paths
+    const downloadPath = EnvConfig.APP_DOWNLOAD_PATH();
+    const originalFolderPath = join(downloadPath, originalFolderName);
+    const newFolderPath = join(downloadPath, newFolderName);
+
+    // update folders
+    fs.renameSync(originalFolderPath, newFolderPath);
+    console.log(
+      `Folder renamed from "${originalFolderName}" to "${newFolderName}"`,
+    );
+
+    // update database
+    const updateResult = db.updateFolderName(originalFolderName, newFolderName);
+    console.log(`Database updated: ${updateResult} records affected`);
+  } catch (e) {
+    const error = e as Error;
+    console.log(error.message);
+  } finally {
+    db?.close();
+  }
 };
