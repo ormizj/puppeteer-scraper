@@ -18,7 +18,10 @@ export default async () => {
   const confirmed = await prompter.promptConfirmation({
     message: `Confirm updating folder name "${prompter.markYellow(originalFolderName)}" to "${prompter.markGreen(newFolderName)}"?`,
   });
-  if (!confirmed) return;
+  if (!confirmed) {
+    console.log("Update cancelled");
+    return;
+  }
 
   let db: Database | undefined;
   try {
