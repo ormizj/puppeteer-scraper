@@ -4,7 +4,7 @@ A TypeScript-based web scraper built with Puppeteer for automated content downlo
 
 ## Features
 
-- Automated login and navigation
+- Automated login and navigation 
 - Content downloading and organization
 - SQLite database integration
 - Environment-based configuration
