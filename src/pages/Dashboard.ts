@@ -125,7 +125,14 @@ export default class Dashboard {
 
         // do the action
         db.insertRecord(id);
-        await activator.click();
+        try {
+          await activator.click();
+        } catch (e) {
+          const error = e as Error;
+          console.error(error.message);
+          db.updateRecordAsFail(id, error.message);
+          continue;
+        }
         await this.#elementor.waitForElementRemovedIfExists(
           this.#MAIN_LOADER_SELECTOR,
         );
