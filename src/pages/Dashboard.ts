@@ -1,6 +1,6 @@
 import type { Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
-import { jitter, sleep } from "../utils/ScraperUtil.ts";
+import { jitter, sleep } from "../utils/scraperUtil.ts";
 import Database from "../classes/Database.ts";
 import DashboardElement from "./DashboardElement.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";

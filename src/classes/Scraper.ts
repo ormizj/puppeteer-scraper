@@ -3,7 +3,7 @@ import type { Browser } from "puppeteer";
 import Navigator from "./Navigator.ts";
 import { EnvConfig } from "../services/EnvConfig.ts";
 import LandingPage from "../pages/LandingPage.ts";
-import { sleep } from "../utils/ScraperUtil.ts";
+import { sleep } from "../utils/scraperUtil.ts";
 import Dashboard from "../pages/Dashboard.ts";
 
 export default class Scraper {

@@ -1,6 +1,6 @@
 import type { Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
-import { sleep } from "../utils/ScraperUtil.ts";
+import { sleep } from "../utils/scraperUtil.ts";
 
 export default class LandingPage {
   readonly #LOGIN_STEP_1_SELECTOR = "header button";

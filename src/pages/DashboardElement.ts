@@ -1,7 +1,7 @@
 import type { ElementHandle, Page } from "puppeteer";
 import Elementor from "../classes/Elementor.ts";
 import { retryHandler } from "../utils/retryUtil.ts";
-import { sleep } from "../utils/ScraperUtil.ts";
+import { sleep } from "../utils/scraperUtil.ts";
 import Downloader from "../classes/Downloader.ts";
 import Database from "../classes/Database.ts";
 
